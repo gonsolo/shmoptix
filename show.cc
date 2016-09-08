@@ -42,8 +42,6 @@ public:
 public:
 	int getChar() {
 		lastChar = input.get();
-		if(lastChar == ',')
-			int i = 10;
 		return lastChar;
 	}
 	Token getToken() {
@@ -54,7 +52,6 @@ public:
 			identifier = lastChar;
 			while(isalnum((getChar())))
 				identifier += lastChar;
-			cout << "lexer identifier: " << identifier << newline;
 			if(identifier == "surface")
 				return tok_surface;
 			return tok_identifier;
@@ -98,7 +95,6 @@ public:
 			return tok_eof;
 		}
 
-		std::cerr << "Lexer error: " << (char)lastChar << std::endl;
 		error("Unknown token");
 	}
 
@@ -143,6 +139,10 @@ public:
 		}
 	}
 
+	void expect(Token expected) {
+		expect(token, "Error");
+	}
+
 	std::unique_ptr<ExprAST> parseNumExpr(double value) {
 		auto result = std::make_unique<NumExprAST>(value);
 		getNextToken();
@@ -154,7 +154,6 @@ public:
 		std::string type = lexer.getIdentifier();
 		getNextToken();
 		std::string name = lexer.getIdentifier();
-		cout << "parse argument: " << name << newline;
 		getNextToken();
 		if(token == tok_equals) {
 			getNextToken();
@@ -176,7 +175,7 @@ public:
 			}
 		}
 	}
-	void parsePrototype() {
+	void parseShaderPrototype() {
 		expect(tok_identifier, "Expected shader name!");
 		std::string shaderName = lexer.getIdentifier();
 		getNextToken();
@@ -186,24 +185,83 @@ public:
 		getNextToken();	
 	}
 
-	void parseExpression() {
-		expect(tok_brace_open, "Expect open brace");
+	void parseIdentifier() {
+		lexer.getIdentifier();
+		getNextToken();
+	}
 
-		while(token != tok_eof) {
-			if(token == tok_number) {
-				auto numExpr = parseNumExpr(lexer.getNumber());
-				numExpr->print();
-			} else {
-				getNextToken();
-			}
+	void parsePrimary() {
+		parseIdentifier();
+	}
+
+	void parseRHS() {
+		expect(tok_star);
+		getNextToken();
+		parseExpression();
+	}
+
+	void parseFunctionCall() {
+		expect(tok_paren_open);
+		getNextToken();
+		parsePrimary();
+		expect(tok_paren_close);
+		getNextToken();
+	}
+
+	void parseBinaryExpression() {
+		parsePrimary();
+		switch(token) {
+		case tok_star:
+			parseRHS();
+			break;
+		case tok_paren_open:
+			parseFunctionCall();
+			break;
+		default:
+			cout << token << ' ' << lexer.getIdentifier() << newline;
+			error("Error in parseBinaryExpression");
 		}
+	}
 
+	void parseExpression() {
+		parseBinaryExpression();
+	}
+
+	void parseAssignmentExpression() {
+
+		expect(tok_identifier, "Error");
+		getNextToken();
+		expect(tok_equals, "Error");
+		getNextToken();
+		parseExpression();
+		expect(tok_semicolon);
+		getNextToken();
+	}
+
+	void parseStatement() {
+		parseAssignmentExpression();
+
+	}
+
+	void parseStatements() {
+		parseStatement();
+	}
+
+	void parseShaderBody() {
+
+		expect(tok_brace_open, "Expect open brace");
+		getNextToken();
+		if(token != tok_brace_close) {
+			parseStatements();
+		}
+		expect(tok_brace_close);
+		getNextToken();
 	}
 
 	void parseSurfaceShader() {
 		getNextToken();
-		parsePrototype();
-		parseExpression();
+		parseShaderPrototype();
+		parseShaderBody();
 	}
 
 	void parse() {
@@ -218,6 +276,7 @@ public:
 			error("Parse error");
 		}
 	}
+
 private:
 	Lexer& lexer;
 	Token token;
