@@ -25,20 +25,36 @@ enum Token {
 	tok_equals	= -24,
 	tok_star	= -25,
 	tok_semicolon	= -26,
+	tok_comma	= -27,
 };
 
-class Lexer {
+class ErrorHandler {
+protected:
+	void error(std::string message) {
+		std::cerr << message << std::endl;
+		exit(-1);
+	}
+};
+
+class Lexer : public ErrorHandler {
 public:
 	Lexer(std::ifstream& shader) : input(shader) {} 
 public:
+	int getChar() {
+		lastChar = input.get();
+		if(lastChar == ',')
+			int i = 10;
+		return lastChar;
+	}
 	Token getToken() {
-		int lastChar = ' ';
 		while(isspace(lastChar))
-			lastChar = input.get();
+			getChar();
+	
 		if(isalpha(lastChar)) {
 			identifier = lastChar;
-			while(isalnum((lastChar = input.get())))
+			while(isalnum((getChar())))
 				identifier += lastChar;
+			cout << "lexer identifier: " << identifier << newline;
 			if(identifier == "surface")
 				return tok_surface;
 			return tok_identifier;
@@ -47,40 +63,51 @@ public:
 			std::string numString;
 			do {
 				numString += lastChar;
-				lastChar = input.get();
+				getChar();
 			} while (isdigit(lastChar));	
 			numVal = strtod(numString.c_str(), 0);
 			return tok_number;
 		}
 
-		if(lastChar == '(')
+		if(lastChar == '(') {
+			getChar();
 			return tok_paren_open;
-		if(lastChar == ')')
+		} if(lastChar == ')') {
+			getChar();
 			return tok_paren_close;
-		if(lastChar == '{')
+		} if(lastChar == '{') {
+			getChar();
 			return tok_brace_open;
-		if(lastChar == '}')
+		} if(lastChar == '}') {
+			getChar();
 			return tok_brace_close;
-		if(lastChar == '=')
+		} if(lastChar == '=') {
+			getChar();
 			return tok_equals;
-		if(lastChar == '*')
+		} if(lastChar == '*') {
+			getChar();
 			return tok_star;
-		if(lastChar == ';')
+		} if(lastChar == ';') {
+			getChar();
 			return tok_semicolon;
-		if(lastChar == EOF)
+		} if(lastChar == ',') {
+			getChar();
+			return tok_comma;
+		} if(lastChar == EOF) {
+			getChar();
 			return tok_eof;
+		}
 
-		std::cerr << (char)lastChar << std::endl;
+		std::cerr << "Lexer error: " << (char)lastChar << std::endl;
 		error("Unknown token");
 	}
 
 	double getNumber() { return numVal; }
+
+	std::string getIdentifier() { return identifier; }
+
 private:
-	void error(std::string message) {
-		std::cerr << message << std::endl;
-		exit(-1);
-	}
-private:
+	int lastChar = ' ';
 	std::ifstream& input;
 	std::string identifier;
 	double numVal;
@@ -102,12 +129,18 @@ private:
 	double value;
 };
 
-class Parser {
+class Parser : public ErrorHandler {
 public:
 	Parser(Lexer& l) : lexer(l) {}
 public:
 	Token getNextToken() {
 		return token = lexer.getToken();
+	}
+
+	void expect(Token expected, std::string message) {
+		if(token != expected) {
+			error(message);
+		}
 	}
 
 	std::unique_ptr<ExprAST> parseNumExpr(double value) {
@@ -116,8 +149,49 @@ public:
 		return std::move(result);
 	}
 
-	void parse() {
-		token = getNextToken();
+	void parseArgument() {
+		cout << token << newline;
+		expect(tok_identifier, "Expected argument type");
+		std::string type = lexer.getIdentifier();
+		getNextToken();
+		std::string name = lexer.getIdentifier();
+		getNextToken();
+		if(token == tok_equals) {
+			getNextToken();
+			expect(tok_number, "Expected a number");
+			double value = lexer.getNumber();
+			getNextToken();	
+		}
+	}
+
+	void parseArguments() {
+		while(token != tok_paren_close) {
+			parseArgument();
+			if(token == tok_comma) {
+				getNextToken();
+			} else if(token == tok_paren_close) {
+				continue;
+			} else {
+				cout << token << newline;
+				error("parseArguments error");
+			}
+		}
+		getNextToken();
+	}
+	void parsePrototype() {
+		expect(tok_identifier, "Expected shader name!");
+		std::string shaderName = lexer.getIdentifier();
+		getNextToken();
+		expect(tok_paren_open, "Expected '('");
+		getNextToken();
+		parseArguments();
+		getNextToken();	
+	}
+
+	void parseSurfaceShader() {
+		getNextToken();
+		parsePrototype();
+
 		while(token != tok_eof) {
 			if(token == tok_number) {
 				auto numExpr = parseNumExpr(lexer.getNumber());
@@ -125,6 +199,19 @@ public:
 			} else {
 				getNextToken();
 			}
+		}
+	}
+
+	void parse() {
+		token = getNextToken();
+		switch(token) {
+		case tok_eof:
+			return;
+		case tok_surface:
+			parseSurfaceShader();
+			break;
+		default:
+			error("Parse error");
 		}
 	}
 private:

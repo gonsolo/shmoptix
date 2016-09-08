@@ -4,4 +4,5 @@ add_compile_options(-std=c++14)
 add_executable(show show.cc)
 add_custom_target(t COMMAND ./show)
 add_custom_target(e COMMAND vi ../show.cc)
+add_custom_target(gdb COMMAND gdb ./show)
 
