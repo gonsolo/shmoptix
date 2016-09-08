@@ -3,6 +3,9 @@
 #include <iostream>
 #include <string>
 
+using std::cout;
+const char newline = '\n';
+
 enum Token {
 	tok_eof		= -1,
 
@@ -81,15 +84,18 @@ private:
 };
 
 int main() {
+	cout << "Reading shader" << newline;
 	std::ifstream matte("../matte.sl");
 	if(!matte) {
 		std::cerr << "Couldn't open matte.sl" << std::endl;
 	}
+	cout << "Lexing" << newline;
 	Lexer lexer(matte);
 	Token token = lexer.getToken();
 	while(token != tok_eof) {
-		std::cout << token << std::endl;
+		//cout << token << std::endl;
 		token = lexer.getToken();
 	}
+	cout << "Done" << newline;
 }
 
