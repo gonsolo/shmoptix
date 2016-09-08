@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 
 using std::cout;
@@ -72,6 +73,8 @@ public:
 		std::cerr << (char)lastChar << std::endl;
 		error("Unknown token");
 	}
+
+	double getNumber() { return numVal; }
 private:
 	void error(std::string message) {
 		std::cerr << message << std::endl;
@@ -83,19 +86,63 @@ private:
 	double numVal;
 };
 
+class ExprAST {
+public:
+	virtual ~ExprAST() {}
+public:
+	virtual void print() = 0;
+};
+
+class NumExprAST : public ExprAST {
+public:
+	NumExprAST(double v) : value(v) {}
+public:
+	void print() { cout << "NumExpr: " << value << newline; }
+private:
+	double value;
+};
+
+class Parser {
+public:
+	Parser(Lexer& l) : lexer(l) {}
+public:
+	Token getNextToken() {
+		return token = lexer.getToken();
+	}
+
+	std::unique_ptr<ExprAST> parseNumExpr(double value) {
+		auto result = std::make_unique<NumExprAST>(value);
+		getNextToken();
+		return std::move(result);
+	}
+
+	void parse() {
+		token = getNextToken();
+		while(token != tok_eof) {
+			if(token == tok_number) {
+				auto numExpr = parseNumExpr(lexer.getNumber());
+				numExpr->print();
+			} else {
+				getNextToken();
+			}
+		}
+	}
+private:
+	Lexer& lexer;
+	Token token;
+};
+
 int main() {
 	cout << "Reading shader" << newline;
 	std::ifstream matte("../matte.sl");
 	if(!matte) {
 		std::cerr << "Couldn't open matte.sl" << std::endl;
 	}
-	cout << "Lexing" << newline;
+	cout << "Parsing" << newline;
 	Lexer lexer(matte);
-	Token token = lexer.getToken();
-	while(token != tok_eof) {
-		//cout << token << std::endl;
-		token = lexer.getToken();
-	}
+	Parser parser(lexer);
+	parser.parse();
+
 	cout << "Done" << newline;
 }
 
