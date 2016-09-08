@@ -150,11 +150,11 @@ public:
 	}
 
 	void parseArgument() {
-		cout << token << newline;
 		expect(tok_identifier, "Expected argument type");
 		std::string type = lexer.getIdentifier();
 		getNextToken();
 		std::string name = lexer.getIdentifier();
+		cout << "parse argument: " << name << newline;
 		getNextToken();
 		if(token == tok_equals) {
 			getNextToken();
@@ -170,13 +170,11 @@ public:
 			if(token == tok_comma) {
 				getNextToken();
 			} else if(token == tok_paren_close) {
-				continue;
+				break;
 			} else {
-				cout << token << newline;
 				error("parseArguments error");
 			}
 		}
-		getNextToken();
 	}
 	void parsePrototype() {
 		expect(tok_identifier, "Expected shader name!");
@@ -188,9 +186,8 @@ public:
 		getNextToken();	
 	}
 
-	void parseSurfaceShader() {
-		getNextToken();
-		parsePrototype();
+	void parseExpression() {
+		expect(tok_brace_open, "Expect open brace");
 
 		while(token != tok_eof) {
 			if(token == tok_number) {
@@ -200,6 +197,13 @@ public:
 				getNextToken();
 			}
 		}
+
+	}
+
+	void parseSurfaceShader() {
+		getNextToken();
+		parsePrototype();
+		parseExpression();
 	}
 
 	void parse() {
