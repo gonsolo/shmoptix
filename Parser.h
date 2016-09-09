@@ -1,9 +1,11 @@
 #pragma once
 
+#include <vector>
 #include "global.h"
 #include "AST.h"
 #include "ErrorHandler.h"
 #include "Lexer.h"
+#include "Type.h"
 
 class Parser : public ErrorHandler {
 public:
@@ -29,23 +31,48 @@ public:
 		return std::move(result);
 	}
 
-	void parseArgument() {
+	Type parseType() {
 		expect(tok_identifier, "Expected argument type");
 		std::string type = lexer.getIdentifier();
+		if (type == "float") {
+			return Float;
+		}
+		else if (type == "color") {
+			return Color;
+		}
+		else {
+			error("Unknown type");
+			return Error;
+		}
+	}
+
+	auto parseArgument() {
+
+		Type type = parseType();
+
 		getNextToken();
 		std::string name = lexer.getIdentifier();
+
+		auto argument = std::make_unique<ArgumentAST>(type, name);
+
 		getNextToken();
 		if(token == tok_equals) {
 			getNextToken();
 			expect(tok_number, "Expected a number");
 			double value = lexer.getNumber();
+			argument->addValue(value);
 			getNextToken();	
 		}
+
+		return std::move(argument);
 	}
 
-	void parseArguments() {
+	auto parseArguments() {
+		auto arguments = std::make_unique<std::vector<std::unique_ptr<ArgumentAST>>>();
+
 		while(token != tok_paren_close) {
-			parseArgument();
+			auto argument = parseArgument();
+			arguments->push_back(std::move(argument));
 			if(token == tok_comma) {
 				getNextToken();
 			} else if(token == tok_paren_close) {
@@ -54,6 +81,7 @@ public:
 				error("parseArguments error");
 			}
 		}
+		return std::move(arguments);
 	}
 
 	std::unique_ptr<ShaderPrototypeAST> parseShaderPrototype() {
@@ -62,10 +90,10 @@ public:
 		getNextToken();
 		expect(tok_paren_open, "Expected '('");
 		getNextToken();
-		parseArguments();
+		auto arguments = parseArguments();
 		getNextToken();
 
-		auto prototype = std::make_unique<ShaderPrototypeAST>(shaderName);
+		auto prototype = std::make_unique<ShaderPrototypeAST>(shaderName, std::move(arguments));
 		getNextToken();
 		return std::move(prototype);
 	}
@@ -148,7 +176,7 @@ public:
 		auto prototype = parseShaderPrototype();
 		parseShaderBody();
 
-		auto surfaceShader = std::make_unique<SurfaceShader>(std::move(prototype));
+		auto surfaceShader = std::make_unique<SurfaceShaderAST>(std::move(prototype));
 		return std::move(surfaceShader);
 	}
 
@@ -168,6 +196,6 @@ public:
 private:
 	Lexer& lexer;
 	Token token;
-	std::unique_ptr<SurfaceShader> surfaceShader;
+	std::unique_ptr<SurfaceShaderAST> surfaceShader;
 };
 

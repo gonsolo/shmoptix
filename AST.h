@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include "AST.h"
+#include "Type.h"
 
 class ExprAST {
 public:
@@ -18,16 +20,28 @@ private:
 	double value;
 };
 
-class ShaderPrototypeAST {
+class ArgumentAST {
 public:
-	ShaderPrototypeAST(std::string shaderName) : name(shaderName) {}
+	ArgumentAST(Type type, std::string name) : type(type), name(name) {}
+public:
+	void addValue(double v) { value = v; }
 private:
+	Type type;
 	std::string name;
+	double value;
 };
 
-class SurfaceShader {
+class ShaderPrototypeAST {
 public:
-	SurfaceShader(std::unique_ptr<ShaderPrototypeAST> p) : prototype(std::move(p)) {}
+	ShaderPrototypeAST(std::string shaderName, std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments) : name(shaderName), arguments(std::move(arguments)) {}
+private:
+	std::string name;
+	std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments;
+};
+
+class SurfaceShaderAST {
+public:
+	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> p) : prototype(std::move(p)) {}
 private:
 	std::unique_ptr<ShaderPrototypeAST> prototype;
 };
