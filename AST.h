@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 class ExprAST {
 public:
 	virtual ~ExprAST() {}
@@ -16,3 +18,16 @@ private:
 	double value;
 };
 
+class ShaderPrototypeAST {
+public:
+	ShaderPrototypeAST(std::string shaderName) : name(shaderName) {}
+private:
+	std::string name;
+};
+
+class SurfaceShader {
+public:
+	SurfaceShader(std::unique_ptr<ShaderPrototypeAST> p) : prototype(std::move(p)) {}
+private:
+	std::unique_ptr<ShaderPrototypeAST> prototype;
+};

@@ -55,14 +55,19 @@ public:
 			}
 		}
 	}
-	void parseShaderPrototype() {
+
+	std::unique_ptr<ShaderPrototypeAST> parseShaderPrototype() {
 		expect(tok_identifier, "Expected shader name!");
 		std::string shaderName = lexer.getIdentifier();
 		getNextToken();
 		expect(tok_paren_open, "Expected '('");
 		getNextToken();
 		parseArguments();
-		getNextToken();	
+		getNextToken();
+
+		auto prototype = std::make_unique<ShaderPrototypeAST>(shaderName);
+		getNextToken();
+		return std::move(prototype);
 	}
 
 	void parseIdentifier() {
@@ -138,10 +143,13 @@ public:
 		getNextToken();
 	}
 
-	void parseSurfaceShader() {
+	auto parseSurfaceShader() {
 		getNextToken();
-		parseShaderPrototype();
+		auto prototype = parseShaderPrototype();
 		parseShaderBody();
+
+		auto surfaceShader = std::make_unique<SurfaceShader>(std::move(prototype));
+		return std::move(surfaceShader);
 	}
 
 	void parse() {
@@ -150,7 +158,7 @@ public:
 		case tok_eof:
 			return;
 		case tok_surface:
-			parseSurfaceShader();
+			surfaceShader = parseSurfaceShader();
 			break;
 		default:
 			error("Parse error");
@@ -160,5 +168,6 @@ public:
 private:
 	Lexer& lexer;
 	Token token;
+	std::unique_ptr<SurfaceShader> surfaceShader;
 };
 
