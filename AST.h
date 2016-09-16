@@ -25,6 +25,7 @@ public:
 	ArgumentAST(Type type, std::string name) : type(type), name(name) {}
 public:
 	void addValue(double v) { value = v; }
+    Type getType() { return type; }
 private:
 	Type type;
 	std::string name;

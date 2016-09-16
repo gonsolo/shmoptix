@@ -64,7 +64,7 @@ public:
 			getNextToken();	
 		}
 
-		return std::move(argument);
+		return argument;
 	}
 
 	auto parseArguments() {
@@ -81,7 +81,7 @@ public:
 				error("parseArguments error");
 			}
 		}
-		return std::move(arguments);
+		return arguments;
 	}
 
 	std::unique_ptr<ShaderPrototypeAST> parseShaderPrototype() {
@@ -95,7 +95,7 @@ public:
 
 		auto prototype = std::make_unique<ShaderPrototypeAST>(shaderName, std::move(arguments));
 		getNextToken();
-		return std::move(prototype);
+		return prototype;
 	}
 
 	void parseIdentifier() {
@@ -177,7 +177,7 @@ public:
 		parseShaderBody();
 
 		auto surfaceShader = std::make_unique<SurfaceShaderAST>(std::move(prototype));
-		return std::move(surfaceShader);
+		return surfaceShader;
 	}
 
 	void parse() {
