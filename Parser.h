@@ -97,85 +97,97 @@ public:
 		return prototype;
 	}
 
-	void parseIdentifier() {
-		lexer.getIdentifier();
+	std::unique_ptr<ExprAST> parseIdentifier() {
+		expect(tok_identifier, "Error identifier");
+		auto name = lexer.getIdentifier();
+		std::unique_ptr<ExprAST> identifier = std::make_unique<VariableExprAST>(name);
 		getNextToken();
+		return std::move(identifier);
 	}
 
-	void parsePrimary() {
-		parseIdentifier();
+	std::unique_ptr<ExprAST> parsePrimary() {
+		return std::move(parseIdentifier());
 	}
 
-	void parseRHS() {
+	std::unique_ptr<ExprAST> parseRHS() {
 		expect(tok_star);
 		getNextToken();
-		parseExpression();
+		auto expression = parseExpression();
+		return expression;
 	}
 
-	void parseFunctionCall() {
+	std::unique_ptr<ExprAST> parseFunctionCall() {
 		expect(tok_paren_open);
 		getNextToken();
-		parsePrimary();
+		auto name = lexer.getIdentifier();
+		getNextToken();
 		expect(tok_paren_close);
 		getNextToken();
+		std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(name);
+		return functionCall;
 	}
 
-	void parseBinaryExpression() {
-		parsePrimary();
+	auto parseBinaryExpression() {
+		auto lhs = parsePrimary();
+		std::unique_ptr<ExprAST> rhs;
 		switch(token) {
 		case tok_star:
-			parseRHS();
+			rhs = parseRHS();
 			break;
 		case tok_paren_open:
-			parseFunctionCall();
+			rhs = parseFunctionCall();
 			break;
 		default:
 			cout << token << ' ' << lexer.getIdentifier() << newline;
 			error("Error in parseBinaryExpression");
 		}
+		auto binaryExpression = std::make_unique<BinaryExprAST>(std::move(lhs), std::move(rhs));
+		return binaryExpression;
 	}
 
-	void parseExpression() {
-		parseBinaryExpression();
+	std::unique_ptr<ExprAST> parseExpression() {
+		return parseBinaryExpression();
 	}
 
-	void parseAssignmentExpression() {
+	std::unique_ptr<ExprAST> parseAssignmentExpression() {
 
-		expect(tok_identifier, "Error");
+		auto lhs = parsePrimary();
+		expect(tok_equals, "Error equals");
 		getNextToken();
-		expect(tok_equals, "Error");
-		getNextToken();
-		parseExpression();
+		auto rhs = parseExpression();
 		expect(tok_semicolon);
 		getNextToken();
+		std::unique_ptr<ExprAST> assignmentExpression = std::make_unique<AssignmentExprAST>(std::move(lhs), std::move(rhs));
+		return assignmentExpression;
 	}
 
-	void parseStatement() {
-		parseAssignmentExpression();
+	auto parseStatement() {
+		return parseAssignmentExpression();
 
 	}
 
-	void parseStatements() {
-		parseStatement();
+	auto parseStatements() {
+		return parseStatement();
 	}
 
-	void parseShaderBody() {
+	auto parseShaderBody() {
 
 		expect(tok_brace_open, "Expect open brace");
 		getNextToken();
+		std::unique_ptr<ExprAST> body;
 		if(token != tok_brace_close) {
-			parseStatements();
+			body = parseStatements();
 		}
 		expect(tok_brace_close);
 		getNextToken();
+		return body;
 	}
 
 	auto parseSurfaceShader() {
 		getNextToken();
 		auto prototype = parseShaderPrototype();
-		parseShaderBody();
-
-		auto surfaceShader = std::make_unique<SurfaceShaderAST>(std::move(prototype));
+		auto body = parseShaderBody();
+		auto surfaceShader = std::make_unique<SurfaceShaderAST>(std::move(prototype), std::move(body));
 		return surfaceShader;
 	}
 
@@ -186,7 +198,7 @@ public:
 			return;
 		case tok_surface:
 			surfaceShader = parseSurfaceShader();
-			surfaceShader->printAST();
+			surfaceShader->print();
 			break;
 		default:
 			error("Parse error");

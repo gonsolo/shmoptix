@@ -11,6 +11,56 @@ public:
 	virtual void print() = 0;
 };
 
+class VariableExprAST : public ExprAST {
+public:
+	VariableExprAST(const std::string name) : name(name) {}
+public:
+	void print() {
+		cout << "VariableExprAST " << name << newline;
+	}
+private:
+	std::string name;
+};
+
+class AssignmentExprAST : public ExprAST {
+public:
+	AssignmentExprAST(std::unique_ptr<ExprAST> lhs, std::unique_ptr<ExprAST> rhs) : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+public:
+	void print() {
+		cout << "AssignmentExpressionAST" << newline;
+		lhs->print();
+		rhs->print();
+	}
+private:
+	std::unique_ptr<ExprAST> lhs;
+	std::unique_ptr<ExprAST> rhs;
+};
+
+class FunctionCallAST : public ExprAST {
+public:
+	FunctionCallAST(const std::string& name) : name(name) {}
+public:
+	void print() {
+		cout << "FunctionCallAST " << name << newline;
+	}
+private:
+	std::string name;
+};
+
+class BinaryExprAST : public ExprAST {
+public:
+	BinaryExprAST(std::unique_ptr<ExprAST> lhs, std::unique_ptr<ExprAST> rhs) : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+public:
+	void print() {
+		cout << "BinaryExprAST" << newline;
+		lhs->print();
+		rhs->print();
+	}
+private:
+	std::unique_ptr<ExprAST> lhs;
+	std::unique_ptr<ExprAST> rhs;
+};
+
 class NumExprAST : public ExprAST {
 public:
 	NumExprAST(double v) : value(v) {}
@@ -20,15 +70,14 @@ private:
 	double value;
 };
 
-class ArgumentAST {
+class ArgumentAST : public ExprAST {
 public:
 	ArgumentAST(Type type, std::string name) : type(type), name(name) {}
 public:
 	void addValue(double v) { value = v; }
     Type getType() { return type; }
-	void printAST() {
+	void print() {
 		cout << "Argument " << type << space << name << space << value << newline;
-
 	}
 private:
 	Type type;
@@ -40,10 +89,10 @@ class ShaderPrototypeAST {
 public:
 	ShaderPrototypeAST(std::string shaderName, std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments) : name(shaderName), arguments(std::move(arguments)) {}
 public:
-	void printAST() {
+	void print() {
 		cout << "ShaderPrototypeAST " << name << newline;
 		for (const auto& argument : *arguments) {
-			argument->printAST();
+			argument->print();
 		}
 	}
 private:
@@ -53,12 +102,14 @@ private:
 
 class SurfaceShaderAST {
 public:
-	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> p) : prototype(std::move(p)) {}
+	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> prototype, std::unique_ptr<ExprAST> body) : prototype(std::move(prototype)), body(std::move(body)) {}
 public:
-	void printAST() {
+	void print() {
 		cout << "SurfaceShaderAST" << newline;
-		prototype->printAST();
+		prototype->print();
+		body->print();
 	}
 private:
 	std::unique_ptr<ShaderPrototypeAST> prototype;
+	std::unique_ptr<ExprAST> body;
 };
