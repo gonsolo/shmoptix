@@ -10,14 +10,19 @@
 #include "AST.h"
 #include "Type.h"
 
-static llvm::LLVMContext TheContext;
 
-class ExprAST {
+class LLVMCodeGen {
+public:
+	virtual llvm::Value* codegen() = 0;
+protected:
+	llvm::LLVMContext LLVMContext;
+};
+
+class ExprAST : public LLVMCodeGen {
 public:
 	virtual ~ExprAST() {}
 public:
 	virtual void print() = 0;
-	virtual llvm::Value* codegen() = 0;
 };
 
 class VariableExprAST : public ExprAST {
@@ -84,7 +89,7 @@ public:
 public:
 	void print() { cout << "NumExpr: " << value << newline; }
 	llvm::Value* codegen() {
-		return llvm::ConstantFP::get(TheContext, llvm::APFloat(value));
+		return llvm::ConstantFP::get(LLVMContext, llvm::APFloat(value));
 	}
 private:
 	double value;
