@@ -2,9 +2,15 @@
 
 #include <memory>
 
+#include "llvm/ADT/APFloat.h"
+#include "llvm/IR/Constants.h"
 #include "llvm/IR/Value.h"
+#include "llvm/IR/LLVMContext.h"
+
 #include "AST.h"
 #include "Type.h"
+
+static llvm::LLVMContext TheContext;
 
 class ExprAST {
 public:
@@ -77,7 +83,9 @@ public:
 	NumExprAST(double v) : value(v) {}
 public:
 	void print() { cout << "NumExpr: " << value << newline; }
-	llvm::Value* codegen() {}
+	llvm::Value* codegen() {
+		return llvm::ConstantFP::get(TheContext, llvm::APFloat(value));
+	}
 private:
 	double value;
 };
