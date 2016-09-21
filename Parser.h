@@ -186,6 +186,7 @@ public:
 			return;
 		case tok_surface:
 			surfaceShader = parseSurfaceShader();
+			surfaceShader->printAST();
 			break;
 		default:
 			error("Parse error");

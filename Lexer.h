@@ -24,6 +24,27 @@ enum Token {
 	tok_comma = -27,
 };
 
+std::ostream& operator<<(std::ostream& out, Token token)
+{
+	switch (token) {
+	case tok_eof:			out << "eof"; break;
+	case tok_surface:		out << "surface"; break;
+	case tok_identifier:	out << "identifier"; break;
+	case tok_number:		out << "number"; break;
+	case tok_paren_open:	out << "("; break;
+	case tok_paren_close:	out << ")"; break;
+	case tok_brace_open:	out << "{"; break;
+	case tok_brace_close:	out << "}"; break;
+	case tok_equals:		out << "="; break;
+	case tok_star:			out << "*"; break;
+	case tok_semicolon:		out << ";"; break;
+	case tok_comma:			out << ","; break;
+	default:				out << "unknown token"; break;
+	}
+	return out;
+}
+
+
 class Lexer : public ErrorHandler {
 public:
 	Lexer(std::ifstream& shader) : input(shader) {}
@@ -90,25 +111,6 @@ public:
 	double getNumber() { return numVal; }
 
 	std::string getIdentifier() { return identifier; }
-
-	void printToken(Token token) {
-		switch (token) {
-		case tok_eof:			cout << "eof"; break;
-		case tok_surface:		cout << "surface"; break;
-		case tok_identifier:	cout << "identifier: " << identifier; break;
-		case tok_number:		cout << "number: " << numVal; break;
-		case tok_paren_open:	cout << "("; break;
-		case tok_paren_close:	cout << ")"; break;
-		case tok_brace_open:	cout << "{"; break;
-		case tok_brace_close:	cout << "}"; break;
-		case tok_equals:		cout << "="; break;
-		case tok_star:			cout << "*"; break;
-		case tok_semicolon:		cout << ";"; break;
-		case tok_comma:			cout << ","; break;
-		default:				cout << "unknown token"; break;
-		}
-		cout << newline;
-	}
 
 
 private:
