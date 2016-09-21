@@ -38,13 +38,14 @@ private:
 
 class FunctionCallAST : public ExprAST {
 public:
-	FunctionCallAST(const std::string& name) : name(name) {}
+	FunctionCallAST(const std::string& name, const std::string argument) : name(name), argument(argument) {}
 public:
 	void print() {
-		cout << "FunctionCallAST " << name << newline;
+		cout << "FunctionCallAST " << name << space << argument << newline;
 	}
 private:
 	std::string name;
+	std::string argument;
 };
 
 class BinaryExprAST : public ExprAST {

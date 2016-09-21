@@ -100,9 +100,22 @@ public:
 	std::unique_ptr<ExprAST> parseIdentifier() {
 		expect(tok_identifier, "Error identifier");
 		auto name = lexer.getIdentifier();
-		std::unique_ptr<ExprAST> identifier = std::make_unique<VariableExprAST>(name);
 		getNextToken();
-		return std::move(identifier);
+
+		// Identifier
+		if (token != tok_paren_open) {
+			return std::make_unique<VariableExprAST>(name);
+		}
+
+		// Function call
+		expect(tok_paren_open);
+		getNextToken();
+		auto argument = lexer.getIdentifier();
+		getNextToken();
+		expect(tok_paren_close);
+		getNextToken();
+		std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(name, argument);
+		return functionCall;
 	}
 
 	std::unique_ptr<ExprAST> parsePrimary() {
@@ -116,26 +129,15 @@ public:
 		return expression;
 	}
 
-	std::unique_ptr<ExprAST> parseFunctionCall() {
-		expect(tok_paren_open);
-		getNextToken();
-		auto name = lexer.getIdentifier();
-		getNextToken();
-		expect(tok_paren_close);
-		getNextToken();
-		std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(name);
-		return functionCall;
-	}
-
-	auto parseBinaryExpression() {
+	std::unique_ptr<ExprAST> parseBinaryExpression() {
 		auto lhs = parsePrimary();
 		std::unique_ptr<ExprAST> rhs;
 		switch(token) {
+		case tok_semicolon:
+			return lhs;
+			break;
 		case tok_star:
 			rhs = parseRHS();
-			break;
-		case tok_paren_open:
-			rhs = parseFunctionCall();
 			break;
 		default:
 			cout << token << ' ' << lexer.getIdentifier() << newline;
