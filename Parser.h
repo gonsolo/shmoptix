@@ -85,6 +85,7 @@ public:
 	}
 
 	std::unique_ptr<ShaderPrototypeAST> parseShaderPrototype() {
+
 		expect(tok_identifier, "Expected shader name!");
 		std::string shaderName = lexer.getIdentifier();
 		getNextToken();
@@ -92,9 +93,7 @@ public:
 		getNextToken();
 		auto arguments = parseArguments();
 		getNextToken();
-
 		auto prototype = std::make_unique<ShaderPrototypeAST>(shaderName, std::move(arguments));
-		getNextToken();
 		return prototype;
 	}
 
