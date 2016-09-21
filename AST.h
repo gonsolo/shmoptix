@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+
+#include "llvm/IR/Value.h"
 #include "AST.h"
 #include "Type.h"
 
@@ -9,6 +11,7 @@ public:
 	virtual ~ExprAST() {}
 public:
 	virtual void print() = 0;
+	virtual llvm::Value* codegen() = 0;
 };
 
 class VariableExprAST : public ExprAST {
@@ -18,6 +21,7 @@ public:
 	void print() {
 		cout << "VariableExprAST " << name << newline;
 	}
+	llvm::Value* codegen() { return nullptr; }
 private:
 	std::string name;
 };
@@ -31,6 +35,10 @@ public:
 		lhs->print();
 		rhs->print();
 	}
+	llvm::Value* codegen() {
+		llvm::Value* value = nullptr;
+		return value;
+	}
 private:
 	std::unique_ptr<ExprAST> lhs;
 	std::unique_ptr<ExprAST> rhs;
@@ -43,6 +51,7 @@ public:
 	void print() {
 		cout << "FunctionCallAST " << name << space << argument << newline;
 	}
+	llvm::Value* codegen() { return nullptr; }
 private:
 	std::string name;
 	std::string argument;
@@ -57,6 +66,7 @@ public:
 		lhs->print();
 		rhs->print();
 	}
+	llvm::Value* codegen() { return nullptr; }
 private:
 	std::unique_ptr<ExprAST> lhs;
 	std::unique_ptr<ExprAST> rhs;
@@ -67,6 +77,7 @@ public:
 	NumExprAST(double v) : value(v) {}
 public:
 	void print() { cout << "NumExpr: " << value << newline; }
+	llvm::Value* codegen() {}
 private:
 	double value;
 };
@@ -79,6 +90,10 @@ public:
     Type getType() { return type; }
 	void print() {
 		cout << "Argument " << type << space << name << space << value << newline;
+	}
+	llvm::Value* codegen() {
+		llvm::Value* value = nullptr;
+		return value;
 	}
 private:
 	Type type;
