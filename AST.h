@@ -25,6 +25,7 @@ public:
 	void installGlobalVariables() {
 		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(LLVMContext);
 		namedValues["Ci"] = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage);
+		namedValues["Cs"] = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage);
 	}
 	virtual llvm::Value* codegen() = 0;
 protected:
