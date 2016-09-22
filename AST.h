@@ -170,7 +170,9 @@ public:
 	}
 	void codegen() {
 		prototype->codegen();
-		body->codegen();
+		if (body) {
+			body->codegen();
+		}
 	}
 private:
 	std::unique_ptr<ShaderPrototypeAST> prototype;

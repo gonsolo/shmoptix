@@ -20,8 +20,9 @@ enum Token {
 	tok_brace_close = -23,
 	tok_equals = -24,
 	tok_star = -25,
-	tok_semicolon = -26,
-	tok_comma = -27,
+	tok_slash = -26,
+	tok_semicolon = -27,
+	tok_comma = -28,
 };
 
 std::ostream& operator<<(std::ostream& out, Token token)
@@ -75,31 +76,55 @@ public:
 			return tok_number;
 		}
 
+		if (lastChar == '/') {
+			getChar();
+			if (lastChar == '/') {
+				do {
+					getChar();
+				} while (lastChar != EOF && lastChar != '\n' && lastChar != '\r');
+
+				if (lastChar != EOF) {
+					return getToken();
+				}
+			}
+			else {
+				return tok_slash;
+			}
+		}
+
 		if (lastChar == '(') {
 			getChar();
 			return tok_paren_open;
-		} if (lastChar == ')') {
+		}
+		if (lastChar == ')') {
 			getChar();
 			return tok_paren_close;
-		} if (lastChar == '{') {
+		}
+		if (lastChar == '{') {
 			getChar();
 			return tok_brace_open;
-		} if (lastChar == '}') {
+		}
+		if (lastChar == '}') {
 			getChar();
 			return tok_brace_close;
-		} if (lastChar == '=') {
+		}
+		if (lastChar == '=') {
 			getChar();
 			return tok_equals;
-		} if (lastChar == '*') {
+		}
+		if (lastChar == '*') {
 			getChar();
 			return tok_star;
-		} if (lastChar == ';') {
+		}
+		if (lastChar == ';') {
 			getChar();
 			return tok_semicolon;
-		} if (lastChar == ',') {
+		}
+		if (lastChar == ',') {
 			getChar();
 			return tok_comma;
-		} if (lastChar == EOF) {
+		}
+		if (lastChar == EOF) {
 			getChar();
 			return tok_eof;
 		}
