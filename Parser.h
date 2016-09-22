@@ -200,7 +200,8 @@ public:
 			return;
 		case tok_surface:
 			surfaceShader = parseSurfaceShader();
-			surfaceShader->print();
+			//surfaceShader->print();
+			surfaceShader->codegen();
 			break;
 		default:
 			error("Parse error");
@@ -212,4 +213,3 @@ private:
 	Token token;
 	std::unique_ptr<SurfaceShaderAST> surfaceShader;
 };
-

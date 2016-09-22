@@ -1,9 +1,14 @@
 #pragma once
 
+#include <map>
 #include <memory>
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/TypeBuilder.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/LLVMContext.h"
 
@@ -13,16 +18,27 @@
 
 class LLVMCodeGen {
 public:
+	LLVMCodeGen() : LLVMContext() {
+		installGlobalVariables();
+	}
+public:
+	void installGlobalVariables() {
+		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(LLVMContext);
+		namedValues["Ci"] = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage);
+	}
 	virtual llvm::Value* codegen() = 0;
 protected:
 	llvm::LLVMContext LLVMContext;
+	std::unique_ptr<llvm::Module> module;
+	std::map<std::string, llvm::Value*> namedValues;
 };
 
-class ExprAST : public LLVMCodeGen {
+class ExprAST : public LLVMCodeGen, public ErrorHandler {
 public:
 	virtual ~ExprAST() {}
 public:
 	virtual void print() = 0;
+	virtual llvm::Value* codegen() = 0;
 };
 
 class VariableExprAST : public ExprAST {
@@ -32,7 +48,15 @@ public:
 	void print() {
 		cout << "VariableExprAST " << name << newline;
 	}
-	llvm::Value* codegen() { return nullptr; }
+	llvm::Value* codegen() { 
+		cout << "variable expr codegen" << newline;
+		llvm::Value* value = namedValues[name];
+		if (!value) {
+			error("Unknown variable: " + name);
+		}
+		cout << "knew var " << name << newline;
+		return value;
+	}
 private:
 	std::string name;
 };
@@ -47,8 +71,11 @@ public:
 		rhs->print();
 	}
 	llvm::Value* codegen() {
-		llvm::Value* value = nullptr;
-		return value;
+		cout << "assign codegen" << newline;
+		lhs->codegen();
+		rhs->codegen();
+		// TODO
+		return nullptr;
 	}
 private:
 	std::unique_ptr<ExprAST> lhs;
@@ -124,6 +151,9 @@ public:
 			argument->print();
 		}
 	}
+	llvm::Value* codegen() {
+		return nullptr;
+	}
 private:
 	std::string name;
 	std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments;
@@ -137,6 +167,10 @@ public:
 		cout << "SurfaceShaderAST" << newline;
 		prototype->print();
 		body->print();
+	}
+	void codegen() {
+		prototype->codegen();
+		body->codegen();
 	}
 private:
 	std::unique_ptr<ShaderPrototypeAST> prototype;
