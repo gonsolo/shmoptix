@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/Support/TargetSelect.h"
 
 #include "CodeGen.h"
@@ -40,7 +41,25 @@ int main(int argc, char** argv) {
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
 
-	std::string errorString("Error");
-	llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move(CodeGen.module)).setErrorStr(&errorString).create();
+	std::string errorString;
+	//llvm::Module* module = CodeGen.module.get();
+
+	llvm::LLVMContext Context;
+	std::unique_ptr<llvm::Module> Owner(new llvm::Module("test", Context));
+	llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move(Owner)).setErrorStr(&errorString).create();
+
+	//llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move(CodeGen.module)).setErrorStr(&errorString).create();
+	if (!engine) {
+		cerr << "Failed to create engine: " << errorString << newline;
+		exit(EXIT_FAILURE);
+	}
+
+	//if (llvm::verifyModule(*module)) {
+	//	cerr << "Error verifying module." << newline;
+	//}
+
+	std::vector<llvm::GenericValue> args(0);
+	engine->runFunction(function, args);
+
 	cout << "Done" << endl;
 }

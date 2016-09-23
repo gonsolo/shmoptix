@@ -16,11 +16,19 @@ endif()
 
 add_executable(show show.cc global.h AST.h CodeGen.h Lexer.h ErrorHandler.h Parser.h)
 
+# Generated with llvm-config --libnames Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen
 target_link_libraries(show
-	LLVMCore LLVMSupport LLVMCodeGen LLVMAnalysis LLVMMC LLVMSelectionDAG LLVMTarget
-	LLVMX86CodeGen LLVMX86Info LLVMX86Desc LLVMX86Utils LLVMX86AsmPrinter 
-	LLVMMCDisassembler LLVMScalarOpts LLVMTransformUtils LLVMAsmParser LLVMAsmPrinter
-	LLVMMCParser LLVMDebugInfoCodeView LLVMExecutionEngine)
+LLVMX86CodeGen.lib LLVMX86Desc.lib LLVMX86Info.lib LLVMMCDisassembler.lib LLVMX86AsmPrinter.lib LLVMX86Utils.lib LLVMSelectionDAG.lib LLVMAsmPrinter.lib LLVMDebugInfoCodeView.lib LLVMMCJIT.lib LLVMInterpreter.lib LLVMCodeGen.lib LLVMScalarOpts.lib LLVMInstCombine.lib LLVMInstrumentation.lib LLVMTransformUtils.lib LLVMBitWriter.lib LLVMExecutionEngine.lib LLVMTarget.lib LLVMAnalysis.lib LLVMProfileData.lib LLVMRuntimeDyld.lib LLVMObject.lib LLVMMCParser.lib LLVMBitReader.lib LLVMMC.lib LLVMCore.lib LLVMSupport.lib
+)
+
+#target_link_libraries(show
+#	LLVMCodeGen LLVMSelectionDAG 
+#	LLVMX86CodeGen LLVMX86Info LLVMX86Desc LLVMX86Utils LLVMX86AsmPrinter 
+#	LLVMMCDisassembler LLVMScalarOpts LLVMTransformUtils LLVMAsmParser LLVMAsmPrinter
+#	LLVMDebugInfoCodeView 
+#	LLVMInterpreter
+#)
+
 if(APPLE)
     target_link_libraries(show curses)
 endif()
