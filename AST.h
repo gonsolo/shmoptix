@@ -13,10 +13,11 @@
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/TypeBuilder.h"
 #include "llvm/IR/Value.h"
-#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Verifier.h"
 
 #include "AST.h"
 #include "Type.h"
@@ -26,7 +27,11 @@
 class LLVMCodeGen {
 private:
 	LLVMCodeGen() : LLVMContext(), Builder(LLVMContext) {
+		module = std::make_unique<llvm::Module>("shmoptix module", LLVMContext);
 		installGlobalVariables();
+	}
+	~LLVMCodeGen() {
+		module->dump();
 	}
 public:
 	static LLVMCodeGen& get() {
@@ -177,8 +182,11 @@ public:
 			argument->print();
 		}
 	}
-	llvm::Value* codegen() {
-		return nullptr;
+	llvm::Function* codegen() {
+
+		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(CodeGen.LLVMContext), false);
+		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "bla", CodeGen.module.get());
+		return function;
 	}
 private:
 	std::string name;
@@ -195,9 +203,17 @@ public:
 		body->print();
 	}
 	void codegen() {
-		prototype->codegen();
+
+
+
+		llvm::Function* function = prototype->codegen();
+
+		llvm::BasicBlock* BB = llvm::BasicBlock::Create(CodeGen.LLVMContext, "entry", function);
+		CodeGen.Builder.SetInsertPoint(BB);
 		if (body) {
-			body->codegen();
+			llvm::Value* retVal = body->codegen();
+			CodeGen.Builder.CreateRet(retVal);
+			llvm::verifyFunction(*function);
 		}
 	}
 private:
