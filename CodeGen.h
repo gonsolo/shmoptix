@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/GlobalVariable.h"
@@ -25,8 +27,13 @@ public:
 	}
 	void installGlobalVariables() {
 		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(LLVMContext);
-		namedValues["Ci"] = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage, nullptr, "Ci");
-		namedValues["Cs"] = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage, nullptr, "Cs");
+
+		llvm::Constant* zero = llvm::ConstantFP::get(LLVMContext, llvm::APFloat(0.f));
+		llvm::Constant* zeroColor[3]{ zero, zero, zero };
+		llvm::Constant* zeroColorInit = llvm::ConstantArray::get(colorType, zeroColor);
+
+		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, zeroColorInit, "Ci");
+		namedValues["Cs"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, zeroColorInit, "Cs");
 	}
 	void insertNameValue(const std::string& name, llvm::Value* value) {
 		namedValues[name] = value;

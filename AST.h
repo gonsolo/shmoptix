@@ -159,8 +159,9 @@ public:
 		CodeGen.Builder.SetInsertPoint(BB);
 		if (body) {
 			body->codegen();
-			llvm::Value* retVal = llvm::ConstantInt::get(CodeGen.LLVMContext, llvm::APInt(32, 0));
-			CodeGen.Builder.CreateRet(retVal);
+			//llvm::Value* retVal = llvm::ConstantInt::get(CodeGen.LLVMContext, llvm::APInt(32, 0));
+			//CodeGen.Builder.CreateRet(retVal);
+			CodeGen.Builder.CreateRetVoid();
 			llvm::verifyFunction(*function);
 		}
 		return function;
