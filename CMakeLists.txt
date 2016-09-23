@@ -14,12 +14,15 @@ if(APPLE)
 link_directories(${LLVM_DIR}/lib)
 endif()
 
-add_executable(show show.cc global.h AST.h Lexer.h ErrorHandler.h Parser.h)
+add_executable(show show.cc global.h AST.h CodeGen.h Lexer.h ErrorHandler.h Parser.h)
 
+target_link_libraries(show
+	LLVMCore LLVMSupport LLVMCodeGen LLVMAnalysis LLVMMC LLVMSelectionDAG LLVMTarget
+	LLVMX86CodeGen LLVMX86Info LLVMX86Desc LLVMX86Utils LLVMX86AsmPrinter 
+	LLVMMCDisassembler LLVMScalarOpts LLVMTransformUtils LLVMAsmParser LLVMAsmPrinter
+	LLVMMCParser LLVMDebugInfoCodeView)
 if(APPLE)
-    target_link_libraries(show LLVMCore LLVMSupport curses)
-else()
-    target_link_libraries(show LLVMCore LLVMSupport)
+    target_link_libraries(show curses)
 endif()
 
 add_custom_target(t COMMAND ./show DEPENDS show)

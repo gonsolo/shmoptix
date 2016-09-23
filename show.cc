@@ -5,12 +5,18 @@
 #include <string>
 #include <utility>
 
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/Support/TargetSelect.h"
+
+#include "CodeGen.h"
 #include "ErrorHandler.h"
 #include "Lexer.h"
 #include "Parser.h"
 
 float Cs[3]{ 1, 0, 0 };
 float Ci[3]{ 0, 0, 0 };
+
+static LLVMCodeGen& CodeGen = LLVMCodeGen::get();
 
 int main(int argc, char** argv) {
 
@@ -31,5 +37,9 @@ int main(int argc, char** argv) {
 	llvm::Function* function = shader->codegen();
 	function->dump();
 
+	llvm::InitializeNativeTarget();
+	llvm::InitializeNativeTargetAsmPrinter();
+
+	//llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move())
 	cout << "Done" << endl;
 }
