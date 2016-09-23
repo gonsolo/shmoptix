@@ -9,6 +9,9 @@
 #include "Lexer.h"
 #include "Parser.h"
 
+float Cs[3]{ 1, 0, 0 };
+float Ci[3]{ 0, 0, 0 };
+
 int main(int argc, char** argv) {
 
 	if (argc != 2) {
@@ -24,7 +27,9 @@ int main(int argc, char** argv) {
 	cout << "Parsing" << endl;
 	Lexer lexer(matte);
 	Parser parser(lexer);
-	parser.parse();
+	std::unique_ptr<SurfaceShaderAST> shader = parser.parse();
+	llvm::Function* function = shader->codegen();
+	function->dump();
+
 	cout << "Done" << endl;
 }
-

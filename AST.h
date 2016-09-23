@@ -194,7 +194,7 @@ public:
 		prototype->print();
 		body->print();
 	}
-	void codegen() {
+	llvm::Function* codegen() {
 
 		llvm::Function* function = prototype->codegen();
 		llvm::BasicBlock* BB = llvm::BasicBlock::Create(CodeGen.LLVMContext, "entry", function);
@@ -205,9 +205,7 @@ public:
 			CodeGen.Builder.CreateRet(retVal);
 			llvm::verifyFunction(*function);
 		}
-	}
-	void dump() {
-		CodeGen.module->dump();
+		return function;
 	}
 private:
 	std::unique_ptr<ShaderPrototypeAST> prototype;

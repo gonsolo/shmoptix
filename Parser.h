@@ -193,20 +193,18 @@ public:
 		return surfaceShader;
 	}
 
-	void parse() {
+	std::unique_ptr<SurfaceShaderAST> parse() {
 		token = getNextToken();
 		switch(token) {
 		case tok_eof:
-			return;
+			return nullptr;
 		case tok_surface:
 			surfaceShader = parseSurfaceShader();
-			//surfaceShader->print();
-			surfaceShader->codegen();
-			surfaceShader->dump();
 			break;
 		default:
 			error("Parse error");
 		}
+		return std::move(surfaceShader);
 	}
 
 private:
