@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
 
-	//llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move())
+	std::string errorString("Error");
+	llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move(CodeGen.module)).setErrorStr(&errorString).create();
 	cout << "Done" << endl;
 }

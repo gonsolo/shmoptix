@@ -20,7 +20,7 @@ target_link_libraries(show
 	LLVMCore LLVMSupport LLVMCodeGen LLVMAnalysis LLVMMC LLVMSelectionDAG LLVMTarget
 	LLVMX86CodeGen LLVMX86Info LLVMX86Desc LLVMX86Utils LLVMX86AsmPrinter 
 	LLVMMCDisassembler LLVMScalarOpts LLVMTransformUtils LLVMAsmParser LLVMAsmPrinter
-	LLVMMCParser LLVMDebugInfoCodeView)
+	LLVMMCParser LLVMDebugInfoCodeView LLVMExecutionEngine)
 if(APPLE)
     target_link_libraries(show curses)
 endif()
