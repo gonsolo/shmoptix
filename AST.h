@@ -30,9 +30,7 @@ private:
 		module = std::make_unique<llvm::Module>("shmoptix module", LLVMContext);
 		installGlobalVariables();
 	}
-	~LLVMCodeGen() {
-		module->dump();
-	}
+	~LLVMCodeGen() {}
 public:
 	static LLVMCodeGen& get() {
 		static LLVMCodeGen instance;
@@ -41,10 +39,8 @@ public:
 	void installGlobalVariables() {
 		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(LLVMContext);
 		llvm::Value* Ci = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage);
-		cout << "init address of Ci: " << Ci << newline;
 		namedValues["Ci"] = Ci;
 		namedValues["Cs"] = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage);
-		cout << "entries in nameValues after initializing: " << namedValues.size() << newline;
 	}
 	void insertNameValue(const std::string& name, llvm::Value* value) {
 		namedValues[name] = value;
@@ -78,12 +74,10 @@ public:
 		cout << "VariableExprAST " << name << newline;
 	}
 	llvm::Value* codegen() { 
-		cout << "variable expr codegen" << newline;
 		llvm::Value* value = CodeGen.lookupNamedValue(name);
 		if (!value) {
 			error("Unknown variable: " + name);
 		}
-		cout << "knew var " << name << newline;
 		return value;
 	}
 private:
@@ -100,7 +94,6 @@ public:
 		rhs->print();
 	}
 	llvm::Value* codegen() {
-		cout << "assign codegen" << newline;
 		llvm::Value* l = lhs->codegen();
 		llvm::Value* r = rhs->codegen();
 		llvm::LoadInst* load = CodeGen.Builder.CreateLoad(r);
@@ -204,10 +197,7 @@ public:
 	}
 	void codegen() {
 
-
-
 		llvm::Function* function = prototype->codegen();
-
 		llvm::BasicBlock* BB = llvm::BasicBlock::Create(CodeGen.LLVMContext, "entry", function);
 		CodeGen.Builder.SetInsertPoint(BB);
 		if (body) {
@@ -215,6 +205,9 @@ public:
 			CodeGen.Builder.CreateRet(retVal);
 			llvm::verifyFunction(*function);
 		}
+	}
+	void dump() {
+		CodeGen.module->dump();
 	}
 private:
 	std::unique_ptr<ShaderPrototypeAST> prototype;

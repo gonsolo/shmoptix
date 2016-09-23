@@ -21,10 +21,10 @@ int main(int argc, char** argv) {
 		std::cerr << "Couldn't open " << shaderName << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	cout << "Parsing" << newline;
+	cout << "Parsing" << endl;
 	Lexer lexer(matte);
 	Parser parser(lexer);
 	parser.parse();
-	cout << "Done" << newline;
+	cout << "Done" << endl;
 }
 

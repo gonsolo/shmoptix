@@ -202,6 +202,7 @@ public:
 			surfaceShader = parseSurfaceShader();
 			//surfaceShader->print();
 			surfaceShader->codegen();
+			surfaceShader->dump();
 			break;
 		default:
 			error("Parse error");
