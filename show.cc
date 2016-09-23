@@ -5,6 +5,9 @@
 #include <string>
 #include <utility>
 
+#define __STDC_LIMIT_MACROS     // bogus error in XCode
+#define __STDC_CONSTANT_MACROS  // ditto
+
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/Support/TargetSelect.h"
@@ -17,7 +20,7 @@
 float Cs[3]{ 1, 0, 0 };
 float Ci[3]{ 0, 0, 0 };
 
-static LLVMCodeGen& CodeGen = LLVMCodeGen::get();
+LLVMCodeGen& CodeGen = LLVMCodeGen::get();
 
 int main(int argc, char** argv) {
 
