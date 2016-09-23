@@ -2,11 +2,13 @@
 
 #include <map>
 #include <memory>
+#include <string>
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/TypeBuilder.h"
 #include "llvm/IR/Value.h"
@@ -16,25 +18,42 @@
 #include "Type.h"
 
 
+
 class LLVMCodeGen {
-public:
-	LLVMCodeGen() : LLVMContext() {
+private:
+	LLVMCodeGen() : LLVMContext(), Builder(LLVMContext) {
 		installGlobalVariables();
 	}
 public:
+	static LLVMCodeGen& get() {
+		static LLVMCodeGen instance;
+		return instance;
+	}
 	void installGlobalVariables() {
 		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(LLVMContext);
-		namedValues["Ci"] = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage);
+		llvm::Value* Ci = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage);
+		cout << "init address of Ci: " << Ci << newline;
+		namedValues["Ci"] = Ci;
 		namedValues["Cs"] = new llvm::GlobalVariable(colorType, false, llvm::GlobalValue::InternalLinkage);
+		cout << "entries in nameValues after initializing: " << namedValues.size() << newline;
 	}
-	virtual llvm::Value* codegen() = 0;
-protected:
+	void insertNameValue(const std::string& name, llvm::Value* value) {
+		namedValues[name] = value;
+	}
+	llvm::Value* lookupNamedValue(const std::string& name) {
+		return namedValues[name];
+	}
+public:
 	llvm::LLVMContext LLVMContext;
+	llvm::IRBuilder<> Builder;
 	std::unique_ptr<llvm::Module> module;
 	std::map<std::string, llvm::Value*> namedValues;
+	//std::map<std::string, llvm::AllocaInst*> namedValues;
 };
 
-class ExprAST : public LLVMCodeGen, public ErrorHandler {
+static LLVMCodeGen& CodeGen = LLVMCodeGen::get();
+
+class ExprAST : public ErrorHandler {
 public:
 	virtual ~ExprAST() {}
 public:
@@ -51,7 +70,7 @@ public:
 	}
 	llvm::Value* codegen() { 
 		cout << "variable expr codegen" << newline;
-		llvm::Value* value = namedValues[name];
+		llvm::Value* value = CodeGen.lookupNamedValue(name);
 		if (!value) {
 			error("Unknown variable: " + name);
 		}
@@ -73,10 +92,12 @@ public:
 	}
 	llvm::Value* codegen() {
 		cout << "assign codegen" << newline;
-		lhs->codegen();
-		rhs->codegen();
-		// TODO
-		return nullptr;
+		llvm::Value* l = lhs->codegen();
+		llvm::Value* r = rhs->codegen();
+		llvm::LoadInst* load = CodeGen.Builder.CreateLoad(r);
+		llvm::StoreInst* store = CodeGen.Builder.CreateStore(load, l);
+		return store;
+
 	}
 private:
 	std::unique_ptr<ExprAST> lhs;
@@ -117,7 +138,7 @@ public:
 public:
 	void print() { cout << "NumExpr: " << value << newline; }
 	llvm::Value* codegen() {
-		return llvm::ConstantFP::get(LLVMContext, llvm::APFloat(value));
+		return llvm::ConstantFP::get(CodeGen.LLVMContext, llvm::APFloat(value));
 	}
 private:
 	double value;
