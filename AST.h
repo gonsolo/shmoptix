@@ -3,7 +3,11 @@
 #include <map>
 #include <memory>
 
+#define __STDC_LIMIT_MACROS     // bogus error in XCode
+#define __STDC_CONSTANT_MACROS  // ditto
+
 #include "llvm/ADT/APFloat.h"
+
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/GlobalVariable.h"

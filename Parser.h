@@ -119,7 +119,7 @@ public:
 	}
 
 	std::unique_ptr<ExprAST> parsePrimary() {
-		return std::move(parseIdentifier());
+		return parseIdentifier();
 	}
 
 	std::unique_ptr<ExprAST> parseRHS() {
@@ -143,7 +143,7 @@ public:
 			cout << token << ' ' << lexer.getIdentifier() << newline;
 			error("Error in parseBinaryExpression");
 		}
-		auto binaryExpression = std::make_unique<BinaryExprAST>(std::move(lhs), std::move(rhs));
+        std::unique_ptr<ExprAST> binaryExpression = std::make_unique<BinaryExprAST>(std::move(lhs), std::move(rhs));
 		return binaryExpression;
 	}
 
