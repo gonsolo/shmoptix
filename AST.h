@@ -177,7 +177,7 @@ public:
 	llvm::Function* codegen() {
 
 		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(CodeGen.LLVMContext), false);
-		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "bla", CodeGen.module.get());
+		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
 		return function;
 	}
 private:
@@ -200,7 +200,8 @@ public:
 		llvm::BasicBlock* BB = llvm::BasicBlock::Create(CodeGen.LLVMContext, "entry", function);
 		CodeGen.Builder.SetInsertPoint(BB);
 		if (body) {
-			llvm::Value* retVal = body->codegen();
+			body->codegen();
+			llvm::Value* retVal = llvm::ConstantInt::get(CodeGen.LLVMContext, llvm::APInt(32, 0));
 			CodeGen.Builder.CreateRet(retVal);
 			llvm::verifyFunction(*function);
 		}
