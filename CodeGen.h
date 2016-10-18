@@ -27,13 +27,16 @@ public:
 	}
 	void installGlobalVariables() {
 		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(LLVMContext);
+		llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(LLVMContext);
 
-		llvm::Constant* zero = llvm::ConstantFP::get(LLVMContext, llvm::APFloat(0.f));
-		llvm::Constant* zeroColor[3]{ zero, zero, zero };
+		llvm::Constant* zeroFloat = llvm::ConstantFP::get(LLVMContext, llvm::APFloat(0.f));
+		llvm::Constant* zeroColor[3]{ zeroFloat, zeroFloat, zeroFloat };
 		llvm::Constant* zeroColorInit = llvm::ConstantArray::get(colorType, zeroColor);
 
-		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, zeroColorInit, "Ci");
-		namedValues["Cs"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, zeroColorInit, "Cs");
+		//namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, zeroColorInit, "Ci");
+		//namedValues["Cs"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, zeroColorInit, "Cs");
+		namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, zeroFloat, "Ci");
+		namedValues["Cs"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, zeroFloat, "Cs");
 	}
 	void insertNameValue(const std::string& name, llvm::Value* value) {
 		namedValues[name] = value;

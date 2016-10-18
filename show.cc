@@ -22,6 +22,9 @@ LLVMCodeGen& CodeGen = LLVMCodeGen::get();
 
 int main(int argc, char** argv) {
 
+	llvm::InitializeNativeTarget();
+	llvm::InitializeNativeTargetAsmPrinter();
+
 	if (argc != 2) {
 		cerr << "Usage: " << argv[0] << " <shader.sl>" << newline;
 		exit(EXIT_FAILURE);
@@ -39,11 +42,12 @@ int main(int argc, char** argv) {
 	llvm::Function* function = shader->codegen();
 	function->dump();
 
-	llvm::InitializeNativeTarget();
-	llvm::InitializeNativeTargetAsmPrinter();
 
 	std::string errorString;
-	//llvm::Module* module = CodeGen.module.get();
+
+	llvm::Module* module = CodeGen.module.get();
+	cout << "show.cc: " << module->getModuleIdentifier() << newline;
+	module->dump();
 
 	//llvm::LLVMContext Context;
 	//std::unique_ptr<llvm::Module> Owner(new llvm::Module("test", Context));
@@ -55,20 +59,26 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	float (*Cs)[3] = static_cast<float(*)[3]>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"))));
-	(*Cs)[0] = 1.f;
-	(*Cs)[1] = 1.f;
-	(*Cs)[2] = 1.f;
-	float (*Ci)[3] = static_cast<float(*)[3]>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Ci"))));
-	(*Ci)[0] = 0.f;
-	(*Ci)[1] = 0.f;
-	(*Ci)[2] = 0.f;
+	//float (*Cs)[3] = static_cast<float(*)[3]>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"))));
+	//(*Cs)[0] = 1.f;
+	//(*Cs)[1] = 1.f;
+	//(*Cs)[2] = 1.f;
+	//float (*Ci)[3] = static_cast<float(*)[3]>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Ci"))));
+	//(*Ci)[0] = 0.f;
+	//(*Ci)[1] = 0.f;
+	//(*Ci)[2] = 0.f;
+
+	float *Cs = static_cast<float*>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"))));
+	float *Ci = static_cast<float*>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"))));
 
 	std::vector<llvm::GenericValue> args(0);
+	*Cs = 13.f;
 	engine->runFunction(function, args);
 
-	cout << "Cs now: " << (*Cs)[0] << space << (*Cs)[1] << space << (*Cs)[2] << newline;
-	cout << "Ci now: " << (*Ci)[0] << space << (*Ci)[1] << space << (*Ci)[2] << newline;
+	//cout << "Cs now: " << (*Cs)[0] /*<< space << (*Cs)[1] << space << (*Cs)[2] */<< newline;
+	//cout << "Ci now: " << (*Ci)[0] /*<< space << (*Ci)[1] << space << (*Ci)[2] */<< newline;
+	cout << "Cs now: " << *Cs /*<< space << (*Cs)[1] << space << (*Cs)[2] */<< newline;
+	cout << "Ci now: " << *Ci /*<< space << (*Ci)[1] << space << (*Ci)[2] */<< newline;
 
 	cout << "Done" << endl;
 }

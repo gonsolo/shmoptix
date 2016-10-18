@@ -135,6 +135,10 @@ public:
 	llvm::Function* codegen() {
 
 		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(CodeGen.LLVMContext), false);
+
+		auto m = CodeGen.module.get();
+		cout << "ShaderPrototypeAST Module ID: " << m->getModuleIdentifier() << newline;
+
 		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
 		return function;
 	}
