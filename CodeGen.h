@@ -35,8 +35,8 @@ public:
 
 		//namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, zeroColorInit, "Ci");
 		//namedValues["Cs"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, zeroColorInit, "Cs");
-		namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, zeroFloat, "Ci");
-		namedValues["Cs"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, zeroFloat, "Cs");
+		namedValues["Cs"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Cs");
+		namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 	}
 	void insertNameValue(const std::string& name, llvm::Value* value) {
 		namedValues[name] = value;
@@ -51,3 +51,9 @@ public:
 	std::map<std::string, llvm::Value*> namedValues;
 };
 
+extern "C" {
+float rCs = 1.f;
+float* Cs = &rCs;
+float rCi = 0.f;
+float* Ci = &rCi;
+}

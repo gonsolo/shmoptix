@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	Parser parser(lexer);
 	std::unique_ptr<SurfaceShaderAST> shader = parser.parse();
 	llvm::Function* function = shader->codegen();
-	function->dump();
+	//function->dump();
 
 
 	std::string errorString;
@@ -59,6 +59,9 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
+	engine->addGlobalMapping("Cs", (uint64_t)Cs);
+	engine->addGlobalMapping("Ci", (uint64_t)Ci);
+
 	//float (*Cs)[3] = static_cast<float(*)[3]>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"))));
 	//(*Cs)[0] = 1.f;
 	//(*Cs)[1] = 1.f;
@@ -68,17 +71,58 @@ int main(int argc, char** argv) {
 	//(*Ci)[1] = 0.f;
 	//(*Ci)[2] = 0.f;
 
-	float *Cs = static_cast<float*>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"))));
-	float *Ci = static_cast<float*>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"))));
+	cout << "Verifying" << newline;
+	if (llvm::verifyModule(*module)) {
+		cout << "Error verifying module" << newline;
+		exit(EXIT_FAILURE);
+	}
 
-	std::vector<llvm::GenericValue> args(0);
+	//float *Cs = static_cast<float*>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"))));
+
+	//auto test1 = llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Cs"));
+	//auto test2 = engine->getPointerToGlobal(test1);
+	//float* test3 = static_cast<float*>(test2);
+
+	llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(CodeGen.LLVMContext);
+	llvm::Constant* zeroFloat = llvm::ConstantFP::get(CodeGen.LLVMContext, llvm::APFloat(0.f));
+
+	auto zeroFloatFP = llvm::dyn_cast<llvm::ConstantFP>(zeroFloat);
+	cout << "zeroFloatFP" << newline;
+	//zeroFloatFP->dump();
+
+	llvm::GlobalVariable* laber = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, zeroFloat, "laber");
+
+	//module->getOrInsertGlobal("laber", floatType);
+	//llvm::GlobalVariable* laberLookup = module->getNamedGlobal("laber");
+	
+
+	//std::vector<llvm::GenericValue> args(0);
+	//args[0].IntVal = llvm::APInt(32, 11);
+
 	*Cs = 13.f;
+	*Ci = 4.f;
+	//cout << "pre Cs now: " << *Cs /*<< space << (*Cs)[1] << space << (*Cs)[2] */<< newline;
+	//cout << "pre Ci now: " << *Ci /*<< space << (*Ci)[1] << space << (*Ci)[2] */<< newline;
+
+	cout << "Cs: " << *Cs << space << ", Ci: " << *Ci << newline;
+
+	cout << "runFunction" << newline;
+	std::vector<llvm::GenericValue> args(0);
+	//llvm::GenericValue result = engine->runFunction(function, args);
 	engine->runFunction(function, args);
+	//cout << "Result: " <<  result.FloatVal << newline;
+
+	cout << "Cs: " << *Cs << space << ", Ci: " << *Ci << newline;
+
+	//float *Ci = static_cast<float*>(engine->getPointerToGlobal(llvm::dyn_cast<llvm::GlobalVariable>(CodeGen.lookupNamedValue("Ci"))));
+	//uint64_t Ci = engine->getGlobalValueAddress("Ci");
+	//float bla = *(float*)Ci;
+	//cout << "bla: " << bla << newline;
 
 	//cout << "Cs now: " << (*Cs)[0] /*<< space << (*Cs)[1] << space << (*Cs)[2] */<< newline;
 	//cout << "Ci now: " << (*Ci)[0] /*<< space << (*Ci)[1] << space << (*Ci)[2] */<< newline;
-	cout << "Cs now: " << *Cs /*<< space << (*Cs)[1] << space << (*Cs)[2] */<< newline;
-	cout << "Ci now: " << *Ci /*<< space << (*Ci)[1] << space << (*Ci)[2] */<< newline;
+	//cout << "post Cs now: " << *Cs /*<< space << (*Cs)[1] << space << (*Cs)[2] */<< newline;
+	//cout << "post Ci now: " << *Ci /*<< space << (*Ci)[1] << space << (*Ci)[2] */<< newline;
 
 	cout << "Done" << endl;
 }

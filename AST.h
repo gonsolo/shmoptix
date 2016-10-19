@@ -135,11 +135,15 @@ public:
 	llvm::Function* codegen() {
 
 		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(CodeGen.LLVMContext), false);
+		//llvm::FunctionType* function2Type = llvm::FunctionType::get(llvm::Type::getInt32Ty(CodeGen.LLVMContext), false);
+		//llvm::FunctionType* function3Type = llvm::FunctionType::get(llvm::Type::getFloatTy(CodeGen.LLVMContext), false);
 
 		auto m = CodeGen.module.get();
 		cout << "ShaderPrototypeAST Module ID: " << m->getModuleIdentifier() << newline;
 
 		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
+		//llvm::Function* function = llvm::Function::Create(function2Type, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
+		//llvm::Function* function = llvm::Function::Create(function3Type, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
 		return function;
 	}
 private:
@@ -163,8 +167,17 @@ public:
 		CodeGen.Builder.SetInsertPoint(BB);
 		if (body) {
 			body->codegen();
-			//llvm::Value* retVal = llvm::ConstantInt::get(CodeGen.LLVMContext, llvm::APInt(32, 0));
+
+
+			//llvm::Value* fiftyfive = llvm::ConstantFP::get(CodeGen.LLVMContext, llvm::APFloat(55.f)); // ::get(CodeGen.LLVMContext, llvm::APInt(32, 23));
+			//llvm::Value* Cs = CodeGen.lookupNamedValue("Cs");
+			//llvm::StoreInst* store = CodeGen.Builder.CreateStore(fiftyfive, Cs);
+			//llvm::LoadInst* load = CodeGen.Builder.CreateLoad(Cs);
+			//CodeGen.Builder.CreateRet(load);
+
+			//llvm::Value* retVal = llvm::ConstantInt::get(CodeGen.LLVMContext, llvm::APInt(32, 23));
 			//CodeGen.Builder.CreateRet(retVal);
+
 			CodeGen.Builder.CreateRetVoid();
 			llvm::verifyFunction(*function);
 		}
