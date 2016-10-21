@@ -50,10 +50,3 @@ public:
 	std::unique_ptr<llvm::Module> module;
 	std::map<std::string, llvm::Value*> namedValues;
 };
-
-extern "C" {
-float rCs = 1.f;
-float* Cs = &rCs;
-float rCi = 0.f;
-float* Ci = &rCi;
-}

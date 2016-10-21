@@ -15,6 +15,7 @@
 
 #include "CodeGen.h"
 #include "ErrorHandler.h"
+#include "ExecutionEnvironment.h"
 #include "Lexer.h"
 #include "Parser.h"
 
@@ -54,8 +55,7 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	engine->addGlobalMapping("Cs", (uint64_t)Cs);
-	engine->addGlobalMapping("Ci", (uint64_t)Ci);
+	ExecutionEnvironment executionEnvironment(engine);
 
 	cout << "Verifying" << newline;
 	if (llvm::verifyModule(*module)) {
@@ -63,14 +63,12 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	*Cs = 13.f;
-	*Ci = 4.f;
-	cout << "Cs: " << *Cs << space << ", Ci: " << *Ci << newline;
+	executionEnvironment.dump();
 
 	cout << "runFunction" << newline;
 	std::vector<llvm::GenericValue> args(0);
 	engine->runFunction(function, args);
 
-	cout << "Cs: " << *Cs << space << ", Ci: " << *Ci << newline;
+	executionEnvironment.dump();
 	cout << "Done" << endl;
 }
