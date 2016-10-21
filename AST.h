@@ -124,29 +124,30 @@ private:
 
 class ShaderPrototypeAST {
 public:
+
 	ShaderPrototypeAST(std::string shaderName, std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments) : name(shaderName), arguments(std::move(arguments)) {}
+
 public:
+
 	void print() {
 		cout << "ShaderPrototypeAST " << name << newline;
 		for (const auto& argument : *arguments) {
 			argument->print();
 		}
 	}
+
 	llvm::Function* codegen() {
 
 		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(CodeGen.LLVMContext), false);
-		//llvm::FunctionType* function2Type = llvm::FunctionType::get(llvm::Type::getInt32Ty(CodeGen.LLVMContext), false);
-		//llvm::FunctionType* function3Type = llvm::FunctionType::get(llvm::Type::getFloatTy(CodeGen.LLVMContext), false);
-
 		auto m = CodeGen.module.get();
 		cout << "ShaderPrototypeAST Module ID: " << m->getModuleIdentifier() << newline;
-
 		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
-		//llvm::Function* function = llvm::Function::Create(function2Type, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
-		//llvm::Function* function = llvm::Function::Create(function3Type, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
+
 		return function;
 	}
+
 private:
+
 	std::string name;
 	std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments;
 };
@@ -155,11 +156,13 @@ class SurfaceShaderAST {
 public:
 	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> prototype, std::unique_ptr<ExprAST> body) : prototype(std::move(prototype)), body(std::move(body)) {}
 public:
+
 	void print() {
 		cout << "SurfaceShaderAST" << newline;
 		prototype->print();
 		body->print();
 	}
+
 	llvm::Function* codegen() {
 
 		llvm::Function* function = prototype->codegen();
@@ -167,17 +170,6 @@ public:
 		CodeGen.Builder.SetInsertPoint(BB);
 		if (body) {
 			body->codegen();
-
-
-			//llvm::Value* fiftyfive = llvm::ConstantFP::get(CodeGen.LLVMContext, llvm::APFloat(55.f)); // ::get(CodeGen.LLVMContext, llvm::APInt(32, 23));
-			//llvm::Value* Cs = CodeGen.lookupNamedValue("Cs");
-			//llvm::StoreInst* store = CodeGen.Builder.CreateStore(fiftyfive, Cs);
-			//llvm::LoadInst* load = CodeGen.Builder.CreateLoad(Cs);
-			//CodeGen.Builder.CreateRet(load);
-
-			//llvm::Value* retVal = llvm::ConstantInt::get(CodeGen.LLVMContext, llvm::APInt(32, 23));
-			//CodeGen.Builder.CreateRet(retVal);
-
 			CodeGen.Builder.CreateRetVoid();
 			llvm::verifyFunction(*function);
 		}
