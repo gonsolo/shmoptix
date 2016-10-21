@@ -7,28 +7,26 @@ add_compile_options(-std=c++14)
 set(LLVM_DIR CACHE PATH "The location of the LLVM installation")
 include_directories(${LLVM_DIR}/include)
 include_directories(${LLVM_DIR}/build/include)
+
 if(MSVC)
     link_directories(${LLVM_DIR}/build/Debug/lib)
+	set(EXE .exe)
 endif()
 if(APPLE)
-link_directories(${LLVM_DIR}/lib)
+	set(ADDITIONAL_LIBS curses z)
+	link_directories(${LLVM_DIR}/lib)
+	add_custom_target(t COMMAND ./shmoptix DEPENDS shmoptix)
+	add_custom_target(e COMMAND vi ../shmoptix.cc)
+	add_custom_target(gdb COMMAND gdb ./shmoptix)
 endif()
 
 add_executable(shmoptix shmoptix.cc global.h AST.h CodeGen.h ExecutionEnvironment.h Lexer.h ErrorHandler.h Parser.h)
 
-# Generated with llvm-config --libnames Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen
-if(APPLE)
-target_link_libraries(shmoptix curses
-libLLVMX86CodeGen.a libLLVMX86Desc.a libLLVMX86Info.a libLLVMMCDisassembler.a libLLVMX86AsmPrinter.a libLLVMX86Utils.a libLLVMSelectionDAG.a libLLVMAsmPrinter.a libLLVMMCJIT.a libLLVMInterpreter.a libLLVMCodeGen.a libLLVMScalarOpts.a libLLVMInstCombine.a libLLVMInstrumentation.a libLLVMProfileData.a libLLVMTransformUtils.a libLLVMBitWriter.a libLLVMExecutionEngine.a libLLVMTarget.a libLLVMAnalysis.a libLLVMRuntimeDyld.a libLLVMObject.a libLLVMMCParser.a libLLVMBitReader.a libLLVMMC.a libLLVMCore.a libLLVMSupport.a
-    curses z
-)
-else()
-target_link_libraries(shmoptix 
-    LLVMX86CodeGen.lib LLVMX86Desc.lib LLVMX86Info.lib LLVMMCDisassembler.lib LLVMX86AsmPrinter.lib LLVMX86Utils.lib LLVMSelectionDAG.lib LLVMAsmPrinter.lib LLVMDebugInfoCodeView.lib LLVMMCJIT.lib LLVMInterpreter.lib LLVMCodeGen.lib LLVMScalarOpts.lib LLVMInstCombine.lib LLVMInstrumentation.lib LLVMTransformUtils.lib LLVMBitWriter.lib LLVMExecutionEngine.lib LLVMTarget.lib LLVMAnalysis.lib LLVMProfileData.lib LLVMRuntimeDyld.lib LLVMObject.lib LLVMMCParser.lib LLVMBitReader.lib LLVMMC.lib LLVMCore.lib LLVMSupport.lib
-)
-endif()
+set(LLVM_MODULES Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen)
+set(LLVM_CONFIG ${LLVM_DIR}/build/Debug/bin/llvm-config${EXE} )
+execute_process(COMMAND ${LLVM_CONFIG} --libnames ${LLVM_MODULES} OUTPUT_VARIABLE LLVM_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
+separate_arguments(LLVM_LIBS)
 
+set(LIBS ${LLVM_LIBS} ${ADDITIONAL_LIBS})
 
-add_custom_target(t COMMAND ./shmoptix DEPENDS shmoptix)
-add_custom_target(e COMMAND vi ../shmoptix.cc)
-add_custom_target(gdb COMMAND gdb ./shmoptix)
+target_link_libraries(shmoptix ${LIBS})
