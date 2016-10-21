@@ -21,6 +21,7 @@ if(APPLE)
 endif()
 
 add_executable(shmoptix shmoptix.cc global.h AST.h CodeGen.h ExecutionEnvironment.h Lexer.h ErrorHandler.h Parser.h)
+set(VS_STARTUP_PROJECT shmoptix)
 
 set(LLVM_MODULES Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen)
 set(LLVM_CONFIG ${LLVM_DIR}/build/Debug/bin/llvm-config${EXE} )

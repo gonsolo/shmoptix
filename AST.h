@@ -6,11 +6,12 @@
 
 #include "llvm/ADT/APFloat.h"
 
+#include "global.h"
 #include "AST.h"
 #include "Type.h"
 #include "CodeGen.h"
 
-class ExprAST : public ErrorHandler, public LLVMCodeGen {
+class ExprAST : public ErrorHandler {
 public:
 	virtual ~ExprAST() {}
 public:
@@ -26,7 +27,7 @@ public:
 		cout << "VariableExprAST " << name << newline;
 	}
 	llvm::Value* codegen() { 
-		llvm::Value* value = lookupNamedValue(name);
+		llvm::Value* value = CodeGen.lookupNamedValue(name);
 		if (!value) {
 			error("Unknown variable: " + name);
 		}
@@ -92,7 +93,7 @@ public:
 public:
 	void print() { cout << "NumExpr: " << value << newline; }
 	llvm::Value* codegen() {
-		return llvm::ConstantFP::get(LLVMContext, llvm::APFloat(value));
+		return llvm::ConstantFP::get(Context, llvm::APFloat(value));
 	}
 private:
 	double value;
@@ -117,7 +118,7 @@ private:
 	double value;
 };
 
-class ShaderPrototypeAST : public LLVMCodeGen {
+class ShaderPrototypeAST {
 public:
 
 	ShaderPrototypeAST(std::string shaderName, std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments) : name(shaderName), arguments(std::move(arguments)) {}
@@ -133,9 +134,8 @@ public:
 
 	llvm::Function* codegen() {
 
-		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(LLVMContext), false);
-		auto m = module.get();
-		cout << "ShaderPrototypeAST Module ID: " << m->getModuleIdentifier() << newline;
+		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(Context), false);
+		cout << "ShaderPrototypeAST Module ID: " << module->getModuleIdentifier() << newline;
 		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, module.get());
 
 		return function;
@@ -147,7 +147,7 @@ private:
 	std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments;
 };
 
-class SurfaceShaderAST : public LLVMCodeGen {
+class SurfaceShaderAST {
 public:
 	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> prototype, std::unique_ptr<ExprAST> body) : prototype(std::move(prototype)), body(std::move(body)) {}
 public:
@@ -161,7 +161,7 @@ public:
 	llvm::Function* codegen() {
 
 		llvm::Function* function = prototype->codegen();
-		llvm::BasicBlock* BB = llvm::BasicBlock::Create(LLVMContext, "entry", function);
+		llvm::BasicBlock* BB = llvm::BasicBlock::Create(Context, "entry", function);
 		Builder.SetInsertPoint(BB);
 		if (body) {
 			body->codegen();

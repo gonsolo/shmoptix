@@ -12,12 +12,13 @@
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Verifier.h"
 
+#include "global.h"
 
 class LLVMCodeGen {
 public:
 
-	LLVMCodeGen() : LLVMContext(), Builder(LLVMContext) {
-		module = std::make_unique<llvm::Module>("shmoptix module", LLVMContext);
+	LLVMCodeGen(llvm::LLVMContext& context, llvm::Module& module) {
+		//module = std::make_unique<llvm::Module>("shmoptix module", LLVMContext);
 		installGlobalVariables();
 	}
 
@@ -26,10 +27,10 @@ public:
 public:
 
 	void installGlobalVariables() {
-		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(LLVMContext);
-		llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(LLVMContext);
+		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(Context);
+		llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
 
-		llvm::Constant* zeroFloat = llvm::ConstantFP::get(LLVMContext, llvm::APFloat(0.f));
+		llvm::Constant* zeroFloat = llvm::ConstantFP::get(Context, llvm::APFloat(0.f));
 		llvm::Constant* zeroColor[3]{ zeroFloat, zeroFloat, zeroFloat };
 		llvm::Constant* zeroColorInit = llvm::ConstantArray::get(colorType, zeroColor);
 
@@ -47,20 +48,12 @@ public:
 		return namedValues[name];
 	}
 
-	void dumpModule() {
-		module->dump();
-	}
-
-	bool verifyModule() {
-		if (llvm::verifyModule(*module)) {
-			return false;
-		}
-		return true;
-	}
-
 public:
-	llvm::LLVMContext LLVMContext;
-	llvm::IRBuilder<> Builder;
-	std::unique_ptr<llvm::Module> module;
+	//llvm::LLVMContext& myLLVMContext;
+	//llvm::IRBuilder<> Builder;
 	std::map<std::string, llvm::Value*> namedValues;
+	//llvm::Module& module;
 };
+
+static LLVMCodeGen CodeGen(Context, *module);
+

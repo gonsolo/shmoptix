@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
 
-	LLVMCodeGen CodeGen;
+	//llvm::LLVMContext context;
 
 	if (argc != 2) {
 		cerr << "Usage: " << argv[0] << " <shader.sl>" << newline;
@@ -43,29 +43,20 @@ int main(int argc, char** argv) {
 	llvm::Function* function = shader->codegen();
 	//function->dump();
 
-	std::string errorString;
-
-	CodeGen.dumpModule();
-
-	llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move(CodeGen.module)).setErrorStr(&errorString).create();
-	if (!engine) {
-		cerr << "Failed to create engine: " << errorString << newline;
-		exit(EXIT_FAILURE);
-	}
-
-	ExecutionEnvironment executionEnvironment(engine);
-
-	executionEnvironment.dump();
+	module->dump();
 
 	cout << "Verifying" << newline;
-	if(!CodeGen.verifyModule()) {
+	if (llvm::verifyModule(*module)) {
 		cout << "Error verifying module" << newline;
 		exit(EXIT_FAILURE);
 	}
 
+	ExecutionEnvironment executionEnvironment(std::move(module));
+
+	executionEnvironment.dump();
+
 	cout << "runFunction" << newline;
-	std::vector<llvm::GenericValue> args(0);
-	engine->runFunction(function, args);
+	executionEnvironment.runFunction(function);
 
 	executionEnvironment.dump();
 	cout << "Done" << endl;
