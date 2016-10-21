@@ -14,17 +14,17 @@
 
 
 class LLVMCodeGen {
-private:
+public:
+
 	LLVMCodeGen() : LLVMContext(), Builder(LLVMContext) {
 		module = std::make_unique<llvm::Module>("shmoptix module", LLVMContext);
 		installGlobalVariables();
 	}
+
 	~LLVMCodeGen() {}
+
 public:
-	static LLVMCodeGen& get() {
-		static LLVMCodeGen instance;
-		return instance;
-	}
+
 	void installGlobalVariables() {
 		llvm::ArrayType* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(LLVMContext);
 		llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(LLVMContext);
@@ -38,12 +38,26 @@ public:
 		namedValues["Cs"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Cs");
 		namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 	}
+
 	void insertNameValue(const std::string& name, llvm::Value* value) {
 		namedValues[name] = value;
 	}
+
 	llvm::Value* lookupNamedValue(const std::string& name) {
 		return namedValues[name];
 	}
+
+	void dumpModule() {
+		module->dump();
+	}
+
+	bool verifyModule() {
+		if (llvm::verifyModule(*module)) {
+			return false;
+		}
+		return true;
+	}
+
 public:
 	llvm::LLVMContext LLVMContext;
 	llvm::IRBuilder<> Builder;

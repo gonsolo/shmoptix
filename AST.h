@@ -10,12 +10,7 @@
 #include "Type.h"
 #include "CodeGen.h"
 
-
-
-extern LLVMCodeGen& CodeGen;
-
-
-class ExprAST : public ErrorHandler {
+class ExprAST : public ErrorHandler, public LLVMCodeGen {
 public:
 	virtual ~ExprAST() {}
 public:
@@ -31,7 +26,7 @@ public:
 		cout << "VariableExprAST " << name << newline;
 	}
 	llvm::Value* codegen() { 
-		llvm::Value* value = CodeGen.lookupNamedValue(name);
+		llvm::Value* value = lookupNamedValue(name);
 		if (!value) {
 			error("Unknown variable: " + name);
 		}
@@ -53,8 +48,8 @@ public:
 	llvm::Value* codegen() {
 		llvm::Value* l = lhs->codegen();
 		llvm::Value* r = rhs->codegen();
-		llvm::LoadInst* load = CodeGen.Builder.CreateLoad(r);
-		llvm::StoreInst* store = CodeGen.Builder.CreateStore(load, l);
+		llvm::LoadInst* load = Builder.CreateLoad(r);
+		llvm::StoreInst* store = Builder.CreateStore(load, l);
 		return store;
 
 	}
@@ -97,7 +92,7 @@ public:
 public:
 	void print() { cout << "NumExpr: " << value << newline; }
 	llvm::Value* codegen() {
-		return llvm::ConstantFP::get(CodeGen.LLVMContext, llvm::APFloat(value));
+		return llvm::ConstantFP::get(LLVMContext, llvm::APFloat(value));
 	}
 private:
 	double value;
@@ -122,7 +117,7 @@ private:
 	double value;
 };
 
-class ShaderPrototypeAST {
+class ShaderPrototypeAST : public LLVMCodeGen {
 public:
 
 	ShaderPrototypeAST(std::string shaderName, std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments) : name(shaderName), arguments(std::move(arguments)) {}
@@ -138,10 +133,10 @@ public:
 
 	llvm::Function* codegen() {
 
-		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(CodeGen.LLVMContext), false);
-		auto m = CodeGen.module.get();
+		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(LLVMContext), false);
+		auto m = module.get();
 		cout << "ShaderPrototypeAST Module ID: " << m->getModuleIdentifier() << newline;
-		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, CodeGen.module.get());
+		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, module.get());
 
 		return function;
 	}
@@ -152,7 +147,7 @@ private:
 	std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments;
 };
 
-class SurfaceShaderAST {
+class SurfaceShaderAST : public LLVMCodeGen {
 public:
 	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> prototype, std::unique_ptr<ExprAST> body) : prototype(std::move(prototype)), body(std::move(body)) {}
 public:
@@ -166,11 +161,11 @@ public:
 	llvm::Function* codegen() {
 
 		llvm::Function* function = prototype->codegen();
-		llvm::BasicBlock* BB = llvm::BasicBlock::Create(CodeGen.LLVMContext, "entry", function);
-		CodeGen.Builder.SetInsertPoint(BB);
+		llvm::BasicBlock* BB = llvm::BasicBlock::Create(LLVMContext, "entry", function);
+		Builder.SetInsertPoint(BB);
 		if (body) {
 			body->codegen();
-			CodeGen.Builder.CreateRetVoid();
+			Builder.CreateRetVoid();
 			llvm::verifyFunction(*function);
 		}
 		return function;

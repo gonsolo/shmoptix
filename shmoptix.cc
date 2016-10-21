@@ -19,12 +19,12 @@
 #include "Lexer.h"
 #include "Parser.h"
 
-LLVMCodeGen& CodeGen = LLVMCodeGen::get();
-
 int main(int argc, char** argv) {
 
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
+
+	LLVMCodeGen CodeGen;
 
 	if (argc != 2) {
 		cerr << "Usage: " << argv[0] << " <shader.sl>" << newline;
@@ -45,9 +45,7 @@ int main(int argc, char** argv) {
 
 	std::string errorString;
 
-	llvm::Module* module = CodeGen.module.get();
-	cout << "show.cc: " << module->getModuleIdentifier() << newline;
-	module->dump();
+	CodeGen.dumpModule();
 
 	llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move(CodeGen.module)).setErrorStr(&errorString).create();
 	if (!engine) {
@@ -57,13 +55,13 @@ int main(int argc, char** argv) {
 
 	ExecutionEnvironment executionEnvironment(engine);
 
+	executionEnvironment.dump();
+
 	cout << "Verifying" << newline;
-	if (llvm::verifyModule(*module)) {
+	if(!CodeGen.verifyModule()) {
 		cout << "Error verifying module" << newline;
 		exit(EXIT_FAILURE);
 	}
-
-	executionEnvironment.dump();
 
 	cout << "runFunction" << newline;
 	std::vector<llvm::GenericValue> args(0);
