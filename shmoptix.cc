@@ -19,6 +19,11 @@
 #include "Lexer.h"
 #include "Parser.h"
 
+llvm::IRBuilder<> Builder(Context);
+llvm::IRBuilder<>& getBuilder() {
+	return Builder;
+}
+
 int main(int argc, char** argv) {
 
 	llvm::InitializeNativeTarget();
@@ -39,6 +44,8 @@ int main(int argc, char** argv) {
 	cout << "Parsing" << endl;
 	Lexer lexer(matte);
 	Parser parser(lexer);
+
+
 	std::unique_ptr<SurfaceShaderAST> shader = parser.parse();
 	llvm::Function* function = shader->codegen();
 	//function->dump();

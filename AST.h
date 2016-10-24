@@ -11,7 +11,16 @@
 #include "Type.h"
 #include "CodeGen.h"
 
-class ExprAST : public ErrorHandler {
+
+class AST : public ErrorHandler {
+public:
+	AST() : Builder(getBuilder()){}
+	virtual ~AST() {}
+protected:
+	llvm::IRBuilder<>& Builder;
+};
+
+class ExprAST : public AST {
 public:
 	virtual ~ExprAST() {}
 public:
@@ -147,7 +156,7 @@ private:
 	std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments;
 };
 
-class SurfaceShaderAST {
+class SurfaceShaderAST : public AST {
 public:
 	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> prototype, std::unique_ptr<ExprAST> body) : prototype(std::move(prototype)), body(std::move(body)) {}
 public:
