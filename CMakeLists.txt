@@ -43,8 +43,8 @@ else() # Linux
     set(LLVM_CONFIG ${LLVM_DIR}/build/bin/llvm-config${EXE} )
 endif()
 
-#set(LLVM_MODULES Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen)
-set(LLVM_MODULES all)
+set(LLVM_MODULES Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen)
+#set(LLVM_MODULES all)
 
 execute_process(COMMAND ${LLVM_CONFIG} --libnames ${LLVM_MODULES} OUTPUT_VARIABLE LLVM_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
 separate_arguments(LLVM_LIBS)
