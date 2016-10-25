@@ -17,8 +17,8 @@ public:
 			exit(EXIT_FAILURE);
 		}
 
-		engine->addGlobalMapping("Cs", (uint64_t)&Cs);
-		engine->addGlobalMapping("Ci", (uint64_t)&Ci);
+		engine->addGlobalMapping(leading_underscore + "Cs", (uint64_t)&Cs);
+		engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)&Ci);
 	}
 
 public:
@@ -30,7 +30,7 @@ public:
 	void runFunction(llvm::Function* function) {
 
 		std::vector<llvm::GenericValue> args(0);
-		engine->runFunction(function, args);
+        engine->runFunction(function, args);
 	}
 
 private:

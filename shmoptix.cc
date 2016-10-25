@@ -49,8 +49,7 @@ int main(int argc, char** argv) {
 	std::unique_ptr<SurfaceShaderAST> shader = parser.parse();
 	llvm::Function* function = shader->codegen();
 	//function->dump();
-
-	module->dump();
+	//module->dump();
 
 	cout << "Verifying" << newline;
 	if (llvm::verifyModule(*module)) {

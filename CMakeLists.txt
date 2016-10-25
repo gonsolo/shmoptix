@@ -20,6 +20,7 @@ if(APPLE)
 	add_custom_target(t COMMAND ./shmoptix DEPENDS shmoptix)
 	add_custom_target(e COMMAND vi ../shmoptix.cc)
 	add_custom_target(gdb COMMAND gdb ./shmoptix)
+    add_definitions(-DLEADING_UNDERSCORE)
 endif()
 
 add_executable(shmoptix shmoptix.cc global.h AST.h CodeGen.h ExecutionEnvironment.h Lexer.h ErrorHandler.h Parser.h)
@@ -28,7 +29,6 @@ if(MSVC)
     set(VS_STARTUP_PROJECT shmoptix)
 endif()
 
-set(LLVM_MODULES Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen)
 
 if(MSVC)
     set(LLVM_CONFIG ${LLVM_DIR}/build/Debug/bin/llvm-config${EXE} )
@@ -36,6 +36,9 @@ endif()
 if(APPLE)
     set(LLVM_CONFIG ${LLVM_DIR}/bin/llvm-config${EXE} )
 endif()
+
+#set(LLVM_MODULES Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen)
+set(LLVM_MODULES all)
 
 execute_process(COMMAND ${LLVM_CONFIG} --libnames ${LLVM_MODULES} OUTPUT_VARIABLE LLVM_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
 separate_arguments(LLVM_LIBS)
