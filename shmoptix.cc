@@ -29,8 +29,6 @@ int main(int argc, char** argv) {
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
 
-	//llvm::LLVMContext context;
-
 	if (argc != 2) {
 		cerr << "Usage: " << argv[0] << " <shader.sl>" << newline;
 		exit(EXIT_FAILURE);
@@ -42,14 +40,12 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	cout << "Parsing" << endl;
-	Lexer lexer(matte);
+	Lexer lexer;
 	Parser parser(lexer);
 
 
-	std::unique_ptr<SurfaceShaderAST> shader = parser.parse();
+	std::unique_ptr<SurfaceShaderAST> shader = parser.parse(matte);
 	llvm::Function* function = shader->codegen();
-	//function->dump();
-	//module->dump();
 
 	cout << "Verifying" << newline;
 	if (llvm::verifyModule(*module)) {
@@ -60,10 +56,8 @@ int main(int argc, char** argv) {
 	ExecutionEnvironment executionEnvironment(std::move(module));
 
 	executionEnvironment.dump();
-
 	cout << "runFunction" << newline;
 	executionEnvironment.runFunction(function);
-
 	executionEnvironment.dump();
 	cout << "Done" << endl;
 }

@@ -193,7 +193,9 @@ public:
 		return surfaceShader;
 	}
 
-	std::unique_ptr<SurfaceShaderAST> parse() {
+    std::unique_ptr<SurfaceShaderAST> parse(std::ifstream& shader) {
+
+        lexer.setInput(&shader);
 		token = getNextToken();
 		switch(token) {
 		case tok_eof:

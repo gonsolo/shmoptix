@@ -48,13 +48,18 @@ std::ostream& operator<<(std::ostream& out, Token token)
 
 class Lexer : public ErrorHandler {
 public:
-	Lexer(std::ifstream& shader) : input(shader) {}
+	Lexer() {}
 public:
-	int getChar() {
-		lastChar = input.get();
+    void setInput(std::ifstream* i) {
+        input = i;
+    }
+
+    int getChar() {
+		lastChar = input->get();
 		return lastChar;
 	}
-	Token getToken() {
+
+    Token getToken() {
 		while (isspace(lastChar))
 			getChar();
 
@@ -140,7 +145,7 @@ public:
 
 private:
 	int lastChar = ' ';
-	std::ifstream& input;
+	std::ifstream* input;
 	std::string identifier;
 	double numVal;
 };
