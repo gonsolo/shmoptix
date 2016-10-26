@@ -40,7 +40,7 @@ public:
 		return namedValues[name];
 	}
 
-public:
+private:
 	std::map<std::string, llvm::Value*> namedValues;
 };
 
