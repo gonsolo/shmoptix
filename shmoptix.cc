@@ -40,9 +40,9 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	cout << "Parsing" << endl;
+
 	Lexer lexer;
 	Parser parser(lexer);
-
 
 	auto shader = parser.parse(matte);
 	auto function = shader->codegen();

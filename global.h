@@ -15,5 +15,5 @@ std::string leading_underscore{""};
 #endif
 
 static llvm::LLVMContext Context;
-std::unique_ptr<llvm::Module> module = std::make_unique<llvm::Module>("shmoptix module", Context);
+std::unique_ptr<llvm::Module> module = std::make_unique<llvm::Module>("Shmoptix", Context);
 llvm::IRBuilder<>& getBuilder();
