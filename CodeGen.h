@@ -27,7 +27,7 @@ public:
 
 	void installGlobalVariables() {
 
-        llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
+        auto floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
         namedValues["Cs"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Cs");
 		namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 	}
@@ -36,7 +36,7 @@ public:
 		namedValues[name] = value;
 	}
 
-	llvm::Value* lookupNamedValue(const std::string& name) {
+	auto lookupNamedValue(const std::string& name) {
 		return namedValues[name];
 	}
 
