@@ -3,6 +3,8 @@
 #include <fstream>
 #include "global.h"
 
+namespace shmoptix {
+
 enum Token {
 	tok_eof = -1,
 
@@ -149,3 +151,5 @@ private:
 	std::string identifier;
 	double numVal;
 };
+
+}

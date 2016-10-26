@@ -14,6 +14,8 @@
 
 #include "global.h"
 
+namespace shmoptix {
+
 class LLVMCodeGen {
 public:
 
@@ -26,10 +28,10 @@ public:
 public:
 
 	void installGlobalVariables() {
-
-        auto floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
-        namedValues["Cs"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Cs");
-		namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
+		//auto floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
+		auto colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(Context);
+		namedValues["Cs"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Cs");
+		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 	}
 
 	void insertNameValue(const std::string& name, llvm::Value* value) {
@@ -45,4 +47,6 @@ private:
 };
 
 static LLVMCodeGen CodeGen(Context, *module);
+
+}
 

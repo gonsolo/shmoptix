@@ -32,7 +32,7 @@ elseif(LINUX)
 	add_custom_target(gdb COMMAND gdb ./shmoptix)
 endif()
 
-add_executable(shmoptix shmoptix.cc global.h AST.h CodeGen.h ExecutionEnvironment.h Lexer.h ErrorHandler.h Parser.h)
+add_executable(shmoptix shmoptix.cc color.h global.h AST.h CodeGen.h ExecutionEnvironment.h Lexer.h ErrorHandler.h Parser.h)
 
 if(MSVC)
     set(VS_STARTUP_PROJECT shmoptix)

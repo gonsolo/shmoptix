@@ -19,10 +19,17 @@
 #include "Lexer.h"
 #include "Parser.h"
 
+
+namespace shmoptix {
+
 llvm::IRBuilder<> Builder(Context);
 llvm::IRBuilder<>& getBuilder() {
 	return Builder;
 }
+
+}
+
+using namespace shmoptix;
 
 int main(int argc, char** argv) {
 

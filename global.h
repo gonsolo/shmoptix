@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+namespace shmoptix {
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -17,3 +19,5 @@ std::string leading_underscore{""};
 static llvm::LLVMContext Context;
 std::unique_ptr<llvm::Module> module = std::make_unique<llvm::Module>("Shmoptix", Context);
 llvm::IRBuilder<>& getBuilder();
+
+}

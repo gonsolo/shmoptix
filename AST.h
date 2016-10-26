@@ -11,6 +11,8 @@
 #include "Type.h"
 #include "CodeGen.h"
 
+namespace shmoptix {
+
 
 class AST : public ErrorHandler {
 public:
@@ -183,3 +185,6 @@ private:
 	std::unique_ptr<ShaderPrototypeAST> prototype;
 	std::unique_ptr<ExprAST> body;
 };
+
+}
+

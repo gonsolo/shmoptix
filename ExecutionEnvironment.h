@@ -3,7 +3,11 @@
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 
 #include "CodeGen.h"
+#include "Color.h"
 #include "global.h"
+
+namespace shmoptix {
+
 
 class ExecutionEnvironment {
 public:
@@ -17,8 +21,8 @@ public:
 			exit(EXIT_FAILURE);
 		}
 
-		engine->addGlobalMapping(leading_underscore + "Cs", (uint64_t)&Cs);
-		engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)&Ci);
+		engine->addGlobalMapping(leading_underscore + "Cs", (uint64_t)Cs.get());
+		engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());
 	}
 
 public:
@@ -29,13 +33,19 @@ public:
 
 	void runFunction(llvm::Function* function) {
 
-		std::vector<llvm::GenericValue> args(0);
-        engine->runFunction(function, args);
+	std::vector<llvm::GenericValue> args(0);
+	engine->runFunction(function, args);
 	}
 
 private:
 
 	llvm::ExecutionEngine* engine;
-	float Cs = 1.f;
-	float Ci = 0.f;
+
+	Color Cs{1.f};
+	Color Ci{0.f};
+	//float Cs[3]{ 1.f, 1.f, 1.f };
+	//float Ci[3]{ 0.f, 0.f, 0.f };
 };
+
+}
+

@@ -7,6 +7,8 @@
 #include "Lexer.h"
 #include "Type.h"
 
+namespace shmoptix {
+
 class Parser : public ErrorHandler {
 public:
 	Parser(Lexer& l) : lexer(l) {}
@@ -35,14 +37,14 @@ public:
 		expect(tok_identifier, "Expected argument type");
 		std::string type = lexer.getIdentifier();
 		if (type == "float") {
-			return Float;
+			return Type::Float;
 		}
 		else if (type == "color") {
-			return Color;
+			return Type::Color;
 		}
 		else {
 			error("Unknown type");
-			return Error;
+			return Type::Error;
 		}
 	}
 
@@ -214,3 +216,6 @@ private:
 	Token token;
 	std::unique_ptr<SurfaceShaderAST> surfaceShader;
 };
+
+}
+

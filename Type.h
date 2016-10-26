@@ -10,9 +10,9 @@ enum Type {
 
 std::ostream& operator<<(std::ostream& out, Type type) {
 	switch (type) {
-	case Float: out << "Float"; break;
-	case Color: out << "Color"; break;
-	case Error: out << "Error"; break;
+	case Type::Float: out << "Float"; break;
+	case Type::Color: out << "Color"; break;
+	case Type::Error: out << "Error"; break;
 	default: out << "Unknown Type"; break;
 	}
 	return out;
