@@ -63,8 +63,8 @@ public:
 		llvm::LoadInst* load = Builder.CreateLoad(r);
 		llvm::StoreInst* store = Builder.CreateStore(load, l);
 		return store;
-
 	}
+
 private:
 	std::unique_ptr<ExprAST> lhs;
 	std::unique_ptr<ExprAST> rhs;
@@ -144,12 +144,8 @@ public:
 	}
 
 	llvm::Function* codegen() {
-
-		llvm::FunctionType* functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(Context), false);
-		cout << "ShaderPrototypeAST Module ID: " << module->getModuleIdentifier() << newline;
-		llvm::Function* function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, module.get());
-
-		return function;
+		auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(Context), false);
+		return llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, name, module.get());
 	}
 
 private:
