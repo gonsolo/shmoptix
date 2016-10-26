@@ -36,7 +36,7 @@ public:
 		cout << "VariableExprAST " << name << newline;
 	}
 	llvm::Value* codegen() { 
-		llvm::Value* value = CodeGen.lookupNamedValue(name);
+		auto value = CodeGen.lookupNamedValue(name);
 		if (!value) {
 			error("Unknown variable: " + name);
 		}

@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
 	Parser parser(lexer);
 
 
-	std::unique_ptr<SurfaceShaderAST> shader = parser.parse(matte);
-	llvm::Function* function = shader->codegen();
+	auto shader = parser.parse(matte);
+	auto function = shader->codegen();
 
 	cout << "Verifying" << newline;
 	if (llvm::verifyModule(*module)) {
