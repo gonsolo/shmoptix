@@ -4,9 +4,11 @@
 
 namespace shmoptix {
 
-using std::cout;
-using std::cerr;
-using std::endl;
+//using std::cout;
+//using std::cerr;
+//using std::endl;
+	auto& cout = llvm::outs();
+	auto& cerr = llvm::errs();
 const char space = ' ';
 const char newline = '\n';
 

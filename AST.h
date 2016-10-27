@@ -62,8 +62,8 @@ public:
 		auto r = rhs->codegen();
 		assert(r != nullptr && "Value codegen: rhs returned nullptr!");
 
-		cout << "l type: " << std::flush; l->getType()->dump();
-		cout << "r type: " << std::flush; r->getType()->dump();
+		//cout << "l type: " << std::flush; l->getType()->dump();
+		//cout << "r type: " << std::flush; r->getType()->dump();
 
 #if 0
 		llvm::Value* store = nullptr;
@@ -89,17 +89,19 @@ public:
 			store = Builder.CreateStore(load, blue);
 		}
 #endif
-		return nullptr;
 #if 0
 		auto nCs = Builder.CreateAlloca(CodeGen.colorType);
 		Builder.CreateStore(r, nCs);
 		auto load = Builder.CreateLoad(nCs);
 		return Builder.CreateStore(load, l);
 #endif
+		auto local = Builder.CreateAlloca(CodeGen.colorType);
+		Builder.CreateStore(r, local);
+
 		//auto load = Builder.CreateLoad(r);
-		//auto store = Builder.CreateStore(load, l);
+		//auto store = Builder.CreateStore(r, l);
 		//return Builder.CreateStore(r, l);
-		//return nullptr;
+		return nullptr;
 	}
 
 private:
@@ -167,9 +169,6 @@ public:
 
 	llvm::Argument* codegen() {
 
-		//return nullptr;
-
-		// Make Value
 		llvm::Type* llvmType = nullptr;
 
 		switch (type) {

@@ -25,7 +25,7 @@ namespace shmoptix {
 
 	public:
 		void dump() {
-			cout << "Ci: " << Ci << newline;
+			//cout << "Ci: " << Ci << newline;
 		}
 
 		void runFunction(const std::string& name, llvm::Function* oldfunction) {
@@ -43,4 +43,3 @@ namespace shmoptix {
 	};
 
 }
-

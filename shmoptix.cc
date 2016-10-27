@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 		std::cerr << "Couldn't open " << fileName << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	cout << "Parsing" << endl;
+	cout << "Parsing" << newline;
 
 	Lexer lexer;
 	Parser parser(lexer);
@@ -58,15 +58,15 @@ int main(int argc, char** argv) {
 	//return 0;
 
 	cout << "Verifying" << newline;
-	if (llvm::verifyModule(*module)) {
+	if (llvm::verifyModule(*module), &cout) {
 		cout << "Error verifying module" << newline;
-		exit(EXIT_FAILURE);
+		exit(0);
 	}
-	cout << "Verification ok." << endl;
+	cout << "Verification ok." << newline;
 
 	ExecutionEnvironment executionEnvironment(std::move(module));
 	executionEnvironment.dump();
 	executionEnvironment.runFunction(function->getName().str(), function);
 	executionEnvironment.dump();
-	cout << "Done" << endl;
+	cout << "Done" << newline;
 }
