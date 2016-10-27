@@ -17,7 +17,7 @@ namespace shmoptix {
 			std::string errorString;
 			engine = llvm::EngineBuilder(std::move(module)).setErrorStr(&errorString).create();
 			if (!engine) {
-				cerr << "Failed to create engine: " << errorString << newline;
+				llvm::outs() << "Failed to create engine: " << errorString << newline;
 				exit(EXIT_FAILURE);
 			}
 			engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());

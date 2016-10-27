@@ -34,7 +34,7 @@ public:
 	VariableExprAST(const std::string name) : name(name) {}
 public:
 	void print() {
-		cout << "VariableExprAST " << name << newline;
+		llvm::outs() << "VariableExprAST " << name << newline;
 	}
 	llvm::Value* codegen() { 
 		auto value = CodeGen.lookupNamedValue(name);
@@ -52,7 +52,7 @@ public:
 	AssignmentExprAST(std::unique_ptr<ExprAST> lhs, std::unique_ptr<ExprAST> rhs) : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
 public:
 	void print() {
-		cout << "AssignmentExpressionAST" << newline;
+		llvm::outs() << "AssignmentExpressionAST" << newline;
 		lhs->print();
 		rhs->print();
 	}
@@ -62,8 +62,8 @@ public:
 		auto r = rhs->codegen();
 		assert(r != nullptr && "Value codegen: rhs returned nullptr!");
 
-		//cout << "l type: " << std::flush; l->getType()->dump();
-		//cout << "r type: " << std::flush; r->getType()->dump();
+		//llvm::outs() << "l type: " << std::flush; l->getType()->dump();
+		//llvm::outs() << "r type: " << std::flush; r->getType()->dump();
 
 #if 0
 		llvm::Value* store = nullptr;
@@ -114,7 +114,7 @@ public:
 	FunctionCallAST(const std::string& name, const std::string argument) : name(name), argument(argument) {}
 public:
 	void print() {
-		cout << "FunctionCallAST " << name << space << argument << newline;
+		llvm::outs() << "FunctionCallAST " << name << space << argument << newline;
 	}
 	llvm::Value* codegen() { return nullptr; }
 private:
@@ -127,7 +127,7 @@ public:
 	BinaryExprAST(std::unique_ptr<ExprAST> lhs, std::unique_ptr<ExprAST> rhs) : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
 public:
 	void print() {
-		cout << "BinaryExprAST" << newline;
+		llvm::outs() << "BinaryExprAST" << newline;
 		lhs->print();
 		rhs->print();
 	}
@@ -146,7 +146,7 @@ class NumExprAST : public ExprAST {
 public:
 	NumExprAST(double v) : value(v) {}
 public:
-	void print() { cout << "NumExpr: " << value << newline; }
+	void print() { llvm::outs() << "NumExpr: " << value << newline; }
 	llvm::Value* codegen() {
 		return llvm::ConstantFP::get(Context, llvm::APFloat(value));
 	}
@@ -164,7 +164,7 @@ public:
 	double getValue() { return value; }
 
 	void print() {
-		cout << "Argument " << type << space << name << space << value << newline;
+		llvm::outs() << "Argument " << type << space << name << space << value << newline;
 	}
 
 	llvm::Argument* codegen() {
@@ -200,7 +200,7 @@ public:
 public:
 
 	void print() {
-		cout << "ShaderPrototypeAST " << name << newline;
+		llvm::outs() << "ShaderPrototypeAST " << name << newline;
 		for (const auto& argument : *arguments) {
 			argument->print();
 		}
@@ -242,7 +242,7 @@ public:
 public:
 
 	void print() {
-		cout << "SurfaceShaderAST" << newline;
+		llvm::outs() << "SurfaceShaderAST" << newline;
 		prototype->print();
 		body->print();
 	}

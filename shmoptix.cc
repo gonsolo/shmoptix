@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 	llvm::InitializeNativeTargetAsmPrinter();
 
 	if (argc != 2) {
-		cerr << "Usage: " << argv[0] << " <shader.sl>" << newline;
+		llvm::outs() << "Usage: " << argv[0] << " <shader.sl>" << newline;
 		exit(EXIT_FAILURE);
 	}
 	std::string fileName(argv[1]);
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 		std::cerr << "Couldn't open " << fileName << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	cout << "Parsing" << newline;
+	llvm::outs() << "Parsing" << newline;
 
 	Lexer lexer;
 	Parser parser(lexer);
@@ -57,16 +57,16 @@ int main(int argc, char** argv) {
 	module->dump();
 	//return 0;
 
-	cout << "Verifying" << newline;
-	if (llvm::verifyModule(*module), &cout) {
-		cout << "Error verifying module" << newline;
+	llvm::outs() << "Verifying" << newline;
+	if (llvm::verifyModule(*module, &llvm::dbgs())) {
+		llvm::outs() << "Error verifying module" << newline;
 		exit(0);
 	}
-	cout << "Verification ok." << newline;
+	llvm::outs() << "Verification ok." << newline;
 
 	ExecutionEnvironment executionEnvironment(std::move(module));
 	executionEnvironment.dump();
 	executionEnvironment.runFunction(function->getName().str(), function);
 	executionEnvironment.dump();
-	cout << "Done" << newline;
+	llvm::outs() << "Done" << newline;
 }

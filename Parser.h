@@ -142,7 +142,7 @@ public:
 			rhs = parseRHS();
 			break;
 		default:
-			cout << token << ' ' << lexer.getIdentifier() << newline;
+			llvm::outs() << token << ' ' << lexer.getIdentifier() << newline;
 			error("Error in parseBinaryExpression");
 		}
         std::unique_ptr<ExprAST> binaryExpression = std::make_unique<BinaryExprAST>(std::move(lhs), std::move(rhs));
