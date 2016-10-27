@@ -2,9 +2,19 @@ cmake_minimum_required(VERSION 3.5)
 
 project(Shmoptix)
 
+find_package(LLVM REQUIRED CONFIG)
+
+# Set LLVM_DIR to <llvm_dir>/build/cmake/modules/CMakeFiles
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
 add_compile_options(-std=c++14)
 
-set(LLVM_DIR CACHE PATH "The location of the LLVM installation")
+include_directories(${LLVM_INCLUDE_DIRS})
+include_directories(${LLVM_INCLUDE_DIRS}/../../include) # bug?
+add_definitions(${LLVM_DEFINITIONS})
+
+message(STATUS ${LLVM_INCLUDE_DIRS})
 
 if(UNIX AND NOT APPLE)
 	set(LINUX TRUE)
@@ -38,17 +48,5 @@ if(MSVC)
     set(VS_STARTUP_PROJECT shmoptix)
 endif()
 
-# Link with LLVM libraries found by llvm_config
-if(MSVC)
-    set(LLVM_CONFIG ${LLVM_DIR}/build/Debug/bin/llvm-config${EXE})
-elseif(APPLE OR LINUX)
-    set(LLVM_CONFIG ${LLVM_DIR}/bin/llvm-config${EXE})
-endif()
-set(LLVM_MODULES Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen)
-execute_process(COMMAND ${LLVM_CONFIG} --libnames ${LLVM_MODULES} OUTPUT_VARIABLE LLVM_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
-if("${LLVM_LIBS}" STREQUAL "")
-	message(FATAL_ERROR "Couldn't find LLVM libraries!")
-endif()
-separate_arguments(LLVM_LIBS)
-set(LIBS ${LLVM_LIBS} ${ADDITIONAL_LIBS})
-target_link_libraries(shmoptix ${LIBS})
+llvm_map_components_to_libnames(llvm_libs Core ExecutionEngine Interpreter MC MCJIT Support nativecodegen)
+target_link_libraries(shmoptix ${llvm_libs})
