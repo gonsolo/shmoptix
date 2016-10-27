@@ -28,7 +28,6 @@ public:
 public:
 
 	void installGlobalVariables() {
-		//namedValues["Cs"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Cs");
 		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 	}
 
