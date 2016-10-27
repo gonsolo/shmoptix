@@ -40,10 +40,10 @@ int main(int argc, char** argv) {
 		cerr << "Usage: " << argv[0] << " <shader.sl>" << newline;
 		exit(EXIT_FAILURE);
 	}
-	std::string shaderName(argv[1]);
-	std::ifstream matte(shaderName);
-	if(!matte) {
-		std::cerr << "Couldn't open " << shaderName << std::endl;
+	std::string fileName(argv[1]);
+	std::ifstream shaderStream(fileName);
+	if(!shaderStream) {
+		std::cerr << "Couldn't open " << fileName << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	cout << "Parsing" << endl;
@@ -51,20 +51,22 @@ int main(int argc, char** argv) {
 	Lexer lexer;
 	Parser parser(lexer);
 
-	auto shader = parser.parse(matte);
+	auto shader = parser.parse(shaderStream);
 	auto function = shader->codegen();
+
+	module->dump();
+	//return 0;
 
 	cout << "Verifying" << newline;
 	if (llvm::verifyModule(*module)) {
 		cout << "Error verifying module" << newline;
 		exit(EXIT_FAILURE);
 	}
+	cout << "Verification ok." << endl;
 
 	ExecutionEnvironment executionEnvironment(std::move(module));
-
 	executionEnvironment.dump();
-	cout << "runFunction" << newline;
-	executionEnvironment.runFunction(function);
+	executionEnvironment.runFunction(function->getName().str(), function);
 	executionEnvironment.dump();
 	cout << "Done" << endl;
 }

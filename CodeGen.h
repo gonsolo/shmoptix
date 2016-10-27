@@ -28,9 +28,7 @@ public:
 public:
 
 	void installGlobalVariables() {
-		//auto floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
-		auto colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(Context);
-		namedValues["Cs"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Cs");
+		//namedValues["Cs"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Cs");
 		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 	}
 
@@ -42,7 +40,12 @@ public:
 		return namedValues[name];
 	}
 
+public:
+	// Type cache
+	llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
+	llvm::Type* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(Context);
 private:
+	// Symbol table
 	std::map<std::string, llvm::Value*> namedValues;
 };
 
