@@ -98,6 +98,7 @@ public:
 		auto local = Builder.CreateAlloca(CodeGen.colorType);
 		Builder.CreateStore(r, local);
 
+
 		//auto load = Builder.CreateLoad(r);
 		//auto store = Builder.CreateStore(r, l);
 		//return Builder.CreateStore(r, l);
@@ -168,23 +169,7 @@ public:
 	}
 
 	llvm::Argument* codegen() {
-
-		llvm::Type* llvmType = nullptr;
-
-		switch (type) {
-		case Type::Float:
-			llvmType = CodeGen.floatType;
-			break;
-		case Type::Color:
-			llvmType = CodeGen.colorType;
-			break;
-		default:
-			error("Unknown Type in Argument codegen!");
-		}
-
-		auto argument = new llvm::Argument(llvmType, name);
-		CodeGen.insertNameValue(name, argument);
-		return argument;
+		return nullptr;
 	}
 private:
 	Type type;
@@ -192,7 +177,7 @@ private:
 	double value;
 };
 
-class ShaderPrototypeAST {
+class ShaderPrototypeAST : public ErrorHandler {
 public:
 
 	ShaderPrototypeAST(std::string shaderName, std::unique_ptr<std::vector<std::unique_ptr<ArgumentAST>>> arguments) : name(shaderName), arguments(std::move(arguments)) {}
@@ -208,25 +193,29 @@ public:
 
 	llvm::Function* codegen() {
 
-		std::vector<llvm::Argument*> llvmArguments;
-		for (auto& argument : *arguments) {
-			auto arg = argument->codegen();
-			llvmArguments.push_back(arg);
-		}
-
 		std::vector<llvm::Type*> argumentTypes;
-		for (auto& argument : llvmArguments) {
-			argumentTypes.push_back(argument->getType());
+		for (auto& argument : *arguments) {
+			switch (argument->getType()) {
+			case Type::Float:
+				argumentTypes.push_back(CodeGen.floatType);
+				break;
+			case Type::Color:
+				argumentTypes.push_back(CodeGen.colorType);
+				break;
+			default:
+				error("Unknown Type in Argument codegen!");
+			}
 		}
 		auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(Context), argumentTypes, false);
 		auto function = llvm::cast<llvm::Function>(module->getOrInsertFunction(name, functionType, llvm::AttributeSet()));
 
-		auto args = function->arg_begin();
-		for (int i = 0; i < arguments->size(); ++i) {
-			args->setName((*arguments)[i]->getName());
-			++args;
-		}
+		auto argIt = arguments->begin();
+		auto llvmIt = function->arg_begin();
 
+		for (int i = 0; i < arguments->size(); ++i) {
+			llvmIt->setName((*argIt)->getName());
+			++argIt; ++llvmIt;
+		}
 		return function;
 	}
 
@@ -252,6 +241,9 @@ public:
 		llvm::Function* function = prototype->codegen();
 		llvm::BasicBlock* BB = llvm::BasicBlock::Create(Context, "entry", function);
 		Builder.SetInsertPoint(BB);
+		for (auto& argument : function->args()) {
+			CodeGen.insertNameValue(argument.getName(), &argument);
+		}
 		if (body) {
 			body->codegen();
 			Builder.CreateRetVoid();
