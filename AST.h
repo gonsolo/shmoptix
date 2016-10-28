@@ -95,14 +95,46 @@ public:
 		auto load = Builder.CreateLoad(nCs);
 		return Builder.CreateStore(load, l);
 #endif
-		auto local = Builder.CreateAlloca(CodeGen.colorType);
-		Builder.CreateStore(r, local);
+		llvm::Value* ret = nullptr;
 
+		llvm::outs() << *(l->getType()) << " " << *(r->getType()) << newline;
 
+		if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.colorType) {
+			auto alloc = Builder.CreateAlloca(CodeGen.colorType);
+			Builder.CreateStore(r, alloc);
+			auto load = Builder.CreateLoad(alloc);
+			ret = Builder.CreateStore(load, l);
+		}
+		else if (l->getType() == CodeGen.floatType && r->getType() == CodeGen.floatType) {
+			llvm::outs() << "TODO: float/float" << newline;
+		}
+		else if (l->getType() == CodeGen.pointerToFloatType && r->getType() == CodeGen.floatType) {
+			auto alloc = Builder.CreateAlloca(CodeGen.floatType);
+			Builder.CreateStore(r, alloc);
+			auto load = Builder.CreateLoad(alloc);
+			ret = Builder.CreateStore(load, l);
+			llvm::outs() << "DONE: float*/float" << newline;
+		}
+		else {
+			llvm::outs() << "TODO: unknown" << newline;
+		}
+
+#if 0
+		auto zero = Builder.getInt32(0);
+		auto red = Builder.CreateGEP(l, zero);
+		Builder.CreateStore(local, red);
+		auto one = Builder.getInt32(1);
+		auto green = Builder.CreateGEP(l, one);
+		Builder.CreateStore(local, green);
+		auto two = Builder.getInt32(2);
+		auto blue = Builder.CreateGEP(l, two);
+		auto store = Builder.CreateStore(local, blue);
+#endif
 		//auto load = Builder.CreateLoad(r);
 		//auto store = Builder.CreateStore(r, l);
 		//return Builder.CreateStore(r, l);
-		return nullptr;
+
+		return ret;
 	}
 
 private:

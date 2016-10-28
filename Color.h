@@ -15,14 +15,18 @@ public:
 public:
 	uint64_t get() { return (uint64_t)value; }
 public:
-	friend std::ostream& operator<<(std::ostream&, const Color&);
+	//friend std::ostream& operator<<(std::ostream&, const Color&);
+	friend llvm::raw_ostream& operator<<(llvm::raw_ostream&, const Color&);
 private:
 	float value[3];
 };
 
-
-std::ostream& operator<<(std::ostream& out, const Color& color) {
+llvm::raw_ostream& operator<<(llvm::raw_ostream& out, const Color& color) {
 	return out << color.value[0] << space << color.value[1] << space << color.value[2];
 }
+
+//std::ostream& operator<<(std::ostream& out, const Color& color) {
+//	return out << color.value[0] << space << color.value[1] << space << color.value[2];
+//}
 
 }

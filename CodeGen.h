@@ -28,7 +28,8 @@ public:
 public:
 
 	void installGlobalVariables() {
-		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
+		//namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
+		namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 	}
 
 	void insertNameValue(const std::string& name, llvm::Value* value) {
@@ -42,7 +43,10 @@ public:
 public:
 	// Type cache
 	llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
+	llvm::Type* pointerToFloatType = llvm::PointerType::getUnqual(floatType);
 	llvm::Type* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(Context);
+	llvm::Type* pointerToColorType = llvm::PointerType::getUnqual(colorType);
+
 private:
 	// Symbol table
 	std::map<std::string, llvm::Value*> namedValues;

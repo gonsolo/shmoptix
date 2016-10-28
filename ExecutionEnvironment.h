@@ -20,26 +20,30 @@ namespace shmoptix {
 				llvm::outs() << "Failed to create engine: " << errorString << newline;
 				exit(EXIT_FAILURE);
 			}
-			engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());
+			//engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());
+			engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)&Ci);
 		}
 
 	public:
 		void dump() {
-			//cout << "Ci: " << Ci << newline;
+			llvm::outs() << "Ci: " << Ci << newline;
 		}
 
 		void runFunction(const std::string& name, llvm::Function* oldfunction) {
 
 			uint64_t address = engine->getFunctionAddress(name);
-			void(*function)(float[3]);
+			//void(*function)(float[3]);
+			void(*function)(float);
 			function = reinterpret_cast<decltype(function)>(address);
-			float Cs[3]{ 1.f, 1.f, 1.f };
+			//float Cs[3]{ 13.f, 1.f, 1.f };
+			float Cs{ 13.f };
 			function(Cs);
 		}
 
 	private:
 		llvm::ExecutionEngine* engine;
-		Color Ci{ 0.f };
+		//Color Ci{ 0.f };
+		float Ci{ 0.f };
 	};
 
 }
