@@ -1,16 +1,16 @@
+; Copied from module dump
 
-@Cs = external global float
-@Ci = external global float
+; ModuleID = 'Shmoptix'
+source_filename = "Shmoptix"
 
-define void @matte() {
+@Ci = external global [3 x float]
+
+define void @matte([3 x float] %Cs) {
 entry:
-	%0 = load float, float* @Cs
-	store float %0, float* @Ci
-
+	%0 = alloca [3 x float]
+	store [3 x float] %Cs, [3 x float]* %0
+	%1 = load [3 x float], [3 x float]* %0
+	store [3 x float] %1, [3 x float]* @Ci
 	ret void
 }
-
-declare void @llvm.debugtrap() nounwind
-
-
 
