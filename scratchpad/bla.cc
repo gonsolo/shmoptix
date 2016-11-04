@@ -1,5 +1,5 @@
 
-#if 0
+#if 1
 float Ci[3];
 void f(float Cs[3]) {
 	Ci[0] = Cs[0];
@@ -8,8 +8,10 @@ void f(float Cs[3]) {
 }
 #endif
 
+#if 0
 float Ci;
 void f(float Cs) {
 	Ci = Cs;
 }
+#endif
 

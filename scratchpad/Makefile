@@ -1,4 +1,7 @@
-all: bla.ll
+all: test
+
+t: test
+test: bla.ll
 	cat $<
 	
 bla.ll: bla.cc
