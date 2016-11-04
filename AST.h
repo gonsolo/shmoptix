@@ -62,39 +62,6 @@ public:
 		auto r = rhs->codegen();
 		assert(r != nullptr && "Value codegen: rhs returned nullptr!");
 
-		//llvm::outs() << "l type: " << std::flush; l->getType()->dump();
-		//llvm::outs() << "r type: " << std::flush; r->getType()->dump();
-
-#if 0
-		llvm::Value* store = nullptr;
-
-		if (l -> getType() == CodeGen.colorType && r->getType() == CodeGen.floatType) {
-
-			auto load = Builder.CreateLoad(r);
-			return store = Builder.CreateStore(load, l);
-
-		} else if (l->getType() == CodeGen.colorType && r->getType() == CodeGen.floatType) {
-
-			// Type convert float -> color
-
-			auto load = Builder.CreateLoad(r);
-			auto zero = Builder.getInt32(0);
-			auto red = Builder.CreateGEP(l, zero);
-			Builder.CreateStore(load, red);
-			auto one = Builder.getInt32(1);
-			auto green = Builder.CreateGEP(l, one);
-			Builder.CreateStore(load, green);
-			auto two = Builder.getInt32(2);
-			auto blue = Builder.CreateGEP(l, two);
-			store = Builder.CreateStore(load, blue);
-		}
-#endif
-#if 0
-		auto nCs = Builder.CreateAlloca(CodeGen.colorType);
-		Builder.CreateStore(r, nCs);
-		auto load = Builder.CreateLoad(nCs);
-		return Builder.CreateStore(load, l);
-#endif
 		llvm::Value* ret = nullptr;
 
 		llvm::outs() << *(l->getType()) << " " << *(r->getType()) << newline;
@@ -143,21 +110,6 @@ public:
 		else {
 			llvm::outs() << "TODO: unknown" << newline;
 		}
-
-#if 0
-		auto zero = Builder.getInt32(0);
-		auto red = Builder.CreateGEP(l, zero);
-		Builder.CreateStore(local, red);
-		auto one = Builder.getInt32(1);
-		auto green = Builder.CreateGEP(l, one);
-		Builder.CreateStore(local, green);
-		auto two = Builder.getInt32(2);
-		auto blue = Builder.CreateGEP(l, two);
-		auto store = Builder.CreateStore(local, blue);
-#endif
-		//auto load = Builder.CreateLoad(r);
-		//auto store = Builder.CreateStore(r, l);
-		//return Builder.CreateStore(r, l);
 
 		return ret;
 	}
