@@ -165,8 +165,8 @@ public:
 		rhs->print();
 	}
 	llvm::Value* codegen() {
-		auto l = lhs->codegen();
-		auto r = rhs->codegen();
+		//auto l = lhs->codegen();
+		//auto r = rhs->codegen();
 
 		return nullptr;
 	}
