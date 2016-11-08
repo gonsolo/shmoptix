@@ -21,6 +21,7 @@ namespace shmoptix {
 				exit(EXIT_FAILURE);
 			}
 			engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());
+			engine->addGlobalMapping(leading_underscore + "N", (uint64_t)N.get());
 			//engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)&Ci);
 		}
 
@@ -45,6 +46,7 @@ namespace shmoptix {
 	private:
 		llvm::ExecutionEngine* engine;
 		Color Ci{ 99.f, 66.f, 33.f };
+		Vector3 N{ 7.f, 77.f, 777.f };
 		//float Ci{ 0.f };
 	};
 

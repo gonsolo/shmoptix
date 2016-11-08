@@ -15,8 +15,21 @@ public:
 public:
 	uint64_t get() { return (uint64_t)value; }
 public:
-	//friend std::ostream& operator<<(std::ostream&, const Color&);
 	friend llvm::raw_ostream& operator<<(llvm::raw_ostream&, const Color&);
+private:
+	float value[3];
+};
+
+class Vector3 {
+public:
+	Vector3() : value{0.f, 0.f, 1.f} {}
+	Vector3(float v) : value{v, v, v} {}
+	Vector3(float x, float y, float z) : value{x, y, z} {}
+	~Vector3() {}
+public:
+	uint64_t get() { return (uint64_t)value; }
+public:
+	friend llvm::raw_ostream& operator<<(llvm::raw_ostream&, const Vector3&);
 private:
 	float value[3];
 };
@@ -25,8 +38,8 @@ llvm::raw_ostream& operator<<(llvm::raw_ostream& out, const Color& color) {
 	return out << color.value[0] << space << color.value[1] << space << color.value[2];
 }
 
-//std::ostream& operator<<(std::ostream& out, const Color& color) {
-//	return out << color.value[0] << space << color.value[1] << space << color.value[2];
-//}
+llvm::raw_ostream& operator<<(llvm::raw_ostream& out, const Vector3& vector) {
+	return out << vector.value[0] << space << vector.value[1] << space << vector.value[2];
+}
 
 }
