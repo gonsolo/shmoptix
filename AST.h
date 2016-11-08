@@ -105,7 +105,6 @@ public:
 			Builder.CreateStore(r, alloc);
 			auto load = Builder.CreateLoad(alloc);
 			ret = Builder.CreateStore(load, l);
-			llvm::outs() << "DONE: float*/float" << newline;
 		}
 		else {
 			llvm::outs() << "TODO: unknown" << newline;

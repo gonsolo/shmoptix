@@ -20,7 +20,7 @@ namespace shmoptix {
 				llvm::outs() << "Failed to create engine: " << errorString << newline;
 				exit(EXIT_FAILURE);
 			}
-            engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());
+			engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());
 			//engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)&Ci);
 		}
 

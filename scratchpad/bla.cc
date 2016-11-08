@@ -11,7 +11,8 @@ void f(float Cs[3]) {
 #if 0
 float Ci;
 void f(float Cs) {
-	Ci = Cs;
+	//Ci = Cs;
+	Ci = 13.f;
 }
 #endif
 

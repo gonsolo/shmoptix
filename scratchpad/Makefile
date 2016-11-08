@@ -22,7 +22,7 @@ clean:
 	rm -f bla.ll testMatte.exe matte.s
 e: edit
 edit:
-	vi bla.cc bla.ll
+	vi testMatte.c
 t: test
 test: testMatte
 	./testMatte
