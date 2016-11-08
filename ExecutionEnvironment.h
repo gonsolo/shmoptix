@@ -32,12 +32,14 @@ namespace shmoptix {
 		void runFunction(const std::string& name, llvm::Function* oldfunction) {
 
 			uint64_t address = engine->getFunctionAddress(name);
-			void(*function)(float[3]);
+			void(*function)(float, float[3]);
+			//void(*function)(float[3]);
 			//void(*function)(float);
 			function = reinterpret_cast<decltype(function)>(address);
+			float Kd = 1.f;
 			float Cs[3]{ 13.f, 26.f, 39.f };
 			//float Cs{ 13.f };
-			function(Cs);
+			function(Kd, Cs);
 		}
 
 	private:
