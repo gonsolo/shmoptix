@@ -10,15 +10,27 @@
 
 namespace shmoptix {
 
-	Vector3 dummyLightVector;
+	Vector3 L{ 1.f, 0.f, 0.f }; // dummy light vector
 
-	Color diffuse(Vector3 normal) {
-		Color color{ 44.f, 55.f, 66.f };
+	float dot(Vector3 a, Vector3 b) {
+		return a.value[0] * b.value[0] + a.value[1] * b.value[1] + a.value[2] * b.value[2];
+	}
 
-		// TODO
-		llvm::outs() << "Calling diffuse" << newline;
-		llvm::outs().flush();
-		return color;
+	float length(Vector3 vector) {
+		return sqrtf(dot(vector, vector));
+	}
+	Vector3 normalize(Vector3 vector) {
+		return vector / length(vector);
+	}
+
+	Color Cl{ 1.f }; // light color
+
+	Color diffuse(Vector3 N) {
+		Color C{ N };
+
+		// Just one light instead of illuminance loop
+		//C += Cl * dot(normalize(L), N);
+		return C;
 	}
 
 	class ExecutionEnvironment {
@@ -59,9 +71,5 @@ namespace shmoptix {
 		llvm::ExecutionEngine* engine;
 		Color Ci{ 99.f, 66.f, 33.f };
 		Vector3 N{ 7.f, 77.f, 777.f };
-		//Color diffuse(Vector3 N) {
-		//	// TODO
-		//}
 	};
-
 }
