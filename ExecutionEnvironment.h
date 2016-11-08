@@ -36,7 +36,7 @@ namespace shmoptix {
 			//void(*function)(float[3]);
 			//void(*function)(float);
 			function = reinterpret_cast<decltype(function)>(address);
-			float Kd = 1.f;
+			float Kd = 2.f;
 			float Cs[3]{ 13.f, 26.f, 39.f };
 			//float Cs{ 13.f };
 			function(Kd, Cs);
