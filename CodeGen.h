@@ -30,6 +30,12 @@ public:
 	void installGlobalVariables() {
 		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 		namedValues["N"] = new llvm::GlobalVariable(*module, vector3Type, false, llvm::GlobalValue::ExternalLinkage, nullptr, "N");
+
+		std::vector<llvm::Type*> argumentTypes;
+		argumentTypes.push_back(pointerToVector3Type);
+		auto functionType = llvm::FunctionType::get(pointerToColorType, argumentTypes, false);
+		auto function = llvm::Function::Create(functionType, llvm::GlobalValue::ExternalLinkage, "diffuse", module.get());
+		namedValues["diffuse"] = function;
 	}
 
 	void insertNameValue(const std::string& name, llvm::Value* value) {

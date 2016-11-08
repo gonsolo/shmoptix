@@ -125,7 +125,16 @@ public:
 	void print() {
 		llvm::outs() << "FunctionCallAST " << name << space << argument << newline;
 	}
-	llvm::Value* codegen() { return nullptr; }
+	llvm::Value* codegen() {
+		
+		llvm::outs() << "Function call: " << name << space << argument << newline;
+		std::vector<llvm::Value*> args;
+		auto arg = CodeGen.lookupNamedValue(argument);
+		args.push_back(arg);
+		auto call = Builder.CreateCall(CodeGen.lookupNamedValue(name), args);
+
+		return call;
+	}
 private:
 	std::string name;
 	std::string argument;

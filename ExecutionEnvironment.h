@@ -10,6 +10,17 @@
 
 namespace shmoptix {
 
+	Vector3 dummyLightVector;
+
+	Color diffuse(Vector3 normal) {
+		Color color{ 44.f, 55.f, 66.f };
+
+		// TODO
+		llvm::outs() << "Calling diffuse" << newline;
+		llvm::outs().flush();
+		return color;
+	}
+
 	class ExecutionEnvironment {
 	public:
 		ExecutionEnvironment(std::unique_ptr<llvm::Module> module) {
@@ -22,6 +33,7 @@ namespace shmoptix {
 			}
 			engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());
 			engine->addGlobalMapping(leading_underscore + "N", (uint64_t)N.get());
+			engine->addGlobalMapping(leading_underscore + "diffuse", (uint64_t)diffuse);
 			//engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)&Ci);
 		}
 
@@ -47,7 +59,9 @@ namespace shmoptix {
 		llvm::ExecutionEngine* engine;
 		Color Ci{ 99.f, 66.f, 33.f };
 		Vector3 N{ 7.f, 77.f, 777.f };
-		//float Ci{ 0.f };
+		//Color diffuse(Vector3 N) {
+		//	// TODO
+		//}
 	};
 
 }
