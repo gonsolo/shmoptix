@@ -67,36 +67,36 @@ public:
 		llvm::outs() << *(l->getType()) << " " << *(r->getType()) << newline;
 
 		if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.pointerToColorType) {
-            llvm::outs() << "WORKS? color*/color*" << newline;
+			llvm::outs() << "WORKS? color*/color*" << newline;
 			auto alloc = Builder.CreateAlloca(CodeGen.pointerToColorType);
 			Builder.CreateStore(r, alloc);
-            auto load = Builder.CreateLoad(alloc);
+			auto load = Builder.CreateLoad(alloc);
 
-            auto zero = Builder.getInt32(0);
-            auto  one = Builder.getInt32(1);
-            auto  two = Builder.getInt32(2);
+			auto zero = Builder.getInt32(0);
+			auto  one = Builder.getInt32(1);
+			auto  two = Builder.getInt32(2);
 
-            std::vector<llvm::Value*> idx{zero, zero};
-            auto elem = Builder.CreateInBoundsGEP(load, idx);
-            auto loadElem = Builder.CreateLoad(elem);
-            std::vector<llvm::Value*> idx2{zero, zero};
-            auto storeElem = Builder.CreateInBoundsGEP(l, idx2);
-            Builder.CreateStore(loadElem, storeElem);
+			std::vector<llvm::Value*> idx{ zero, zero };
+			auto elem = Builder.CreateInBoundsGEP(load, idx);
+			auto loadElem = Builder.CreateLoad(elem);
+			std::vector<llvm::Value*> idx2{ zero, zero };
+			auto storeElem = Builder.CreateInBoundsGEP(l, idx2);
+			Builder.CreateStore(loadElem, storeElem);
 
-            idx[1] = one;
-            elem = Builder.CreateInBoundsGEP(load, idx);
-            loadElem = Builder.CreateLoad(elem);
-            idx2[1] = one;
-            storeElem = Builder.CreateInBoundsGEP(l, idx2);
-            Builder.CreateStore(loadElem, storeElem);
+			idx[1] = one;
+			elem = Builder.CreateInBoundsGEP(load, idx);
+			loadElem = Builder.CreateLoad(elem);
+			idx2[1] = one;
+			storeElem = Builder.CreateInBoundsGEP(l, idx2);
+			Builder.CreateStore(loadElem, storeElem);
 
-            idx[1] = two;
-            elem = Builder.CreateInBoundsGEP(load, idx);
-            loadElem = Builder.CreateLoad(elem);
-            idx2[1] = two;
-            storeElem = Builder.CreateInBoundsGEP(l, idx2);
-            ret = Builder.CreateStore(loadElem, storeElem);
-        }
+			idx[1] = two;
+			elem = Builder.CreateInBoundsGEP(load, idx);
+			loadElem = Builder.CreateLoad(elem);
+			idx2[1] = two;
+			storeElem = Builder.CreateInBoundsGEP(l, idx2);
+			ret = Builder.CreateStore(loadElem, storeElem);
+		}
 		else if (l->getType() == CodeGen.floatType && r->getType() == CodeGen.floatType) {
 			llvm::outs() << "TODO: float/float" << newline;
 		}
