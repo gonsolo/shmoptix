@@ -8,7 +8,7 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS     // bogus error in XCode
 #endif
-#ifndef __STD_CONSTANT_MACROS
+#ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS  // ditto
 #endif
 

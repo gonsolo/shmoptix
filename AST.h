@@ -62,49 +62,41 @@ public:
 		auto r = rhs->codegen();
 		assert(r != nullptr && "Value codegen: rhs returned nullptr!");
 
-		//llvm::outs() << "l type: " << std::flush; l->getType()->dump();
-		//llvm::outs() << "r type: " << std::flush; r->getType()->dump();
-
-#if 0
-		llvm::Value* store = nullptr;
-
-		if (l -> getType() == CodeGen.colorType && r->getType() == CodeGen.floatType) {
-
-			auto load = Builder.CreateLoad(r);
-			return store = Builder.CreateStore(load, l);
-
-		} else if (l->getType() == CodeGen.colorType && r->getType() == CodeGen.floatType) {
-
-			// Type convert float -> color
-
-			auto load = Builder.CreateLoad(r);
-			auto zero = Builder.getInt32(0);
-			auto red = Builder.CreateGEP(l, zero);
-			Builder.CreateStore(load, red);
-			auto one = Builder.getInt32(1);
-			auto green = Builder.CreateGEP(l, one);
-			Builder.CreateStore(load, green);
-			auto two = Builder.getInt32(2);
-			auto blue = Builder.CreateGEP(l, two);
-			store = Builder.CreateStore(load, blue);
-		}
-#endif
-#if 0
-		auto nCs = Builder.CreateAlloca(CodeGen.colorType);
-		Builder.CreateStore(r, nCs);
-		auto load = Builder.CreateLoad(nCs);
-		return Builder.CreateStore(load, l);
-#endif
 		llvm::Value* ret = nullptr;
 
 		llvm::outs() << *(l->getType()) << " " << *(r->getType()) << newline;
 
-		if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.colorType) {
-			auto alloc = Builder.CreateAlloca(CodeGen.colorType);
+		if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.pointerToColorType) {
+            llvm::outs() << "WORKS? color*/color*" << newline;
+			auto alloc = Builder.CreateAlloca(CodeGen.pointerToColorType);
 			Builder.CreateStore(r, alloc);
-			auto load = Builder.CreateLoad(alloc);
-			ret = Builder.CreateStore(load, l);
-		}
+            auto load = Builder.CreateLoad(alloc);
+
+            auto zero = Builder.getInt32(0);
+            auto  one = Builder.getInt32(1);
+            auto  two = Builder.getInt32(2);
+
+            std::vector<llvm::Value*> idx{zero, zero};
+            auto elem = Builder.CreateInBoundsGEP(load, idx);
+            auto loadElem = Builder.CreateLoad(elem);
+            std::vector<llvm::Value*> idx2{zero, zero};
+            auto storeElem = Builder.CreateInBoundsGEP(l, idx2);
+            Builder.CreateStore(loadElem, storeElem);
+
+            idx[1] = one;
+            elem = Builder.CreateInBoundsGEP(load, idx);
+            loadElem = Builder.CreateLoad(elem);
+            idx2[1] = one;
+            storeElem = Builder.CreateInBoundsGEP(l, idx2);
+            Builder.CreateStore(loadElem, storeElem);
+
+            idx[1] = two;
+            elem = Builder.CreateInBoundsGEP(load, idx);
+            loadElem = Builder.CreateLoad(elem);
+            idx2[1] = two;
+            storeElem = Builder.CreateInBoundsGEP(l, idx2);
+            ret = Builder.CreateStore(loadElem, storeElem);
+        }
 		else if (l->getType() == CodeGen.floatType && r->getType() == CodeGen.floatType) {
 			llvm::outs() << "TODO: float/float" << newline;
 		}
@@ -118,21 +110,6 @@ public:
 		else {
 			llvm::outs() << "TODO: unknown" << newline;
 		}
-
-#if 0
-		auto zero = Builder.getInt32(0);
-		auto red = Builder.CreateGEP(l, zero);
-		Builder.CreateStore(local, red);
-		auto one = Builder.getInt32(1);
-		auto green = Builder.CreateGEP(l, one);
-		Builder.CreateStore(local, green);
-		auto two = Builder.getInt32(2);
-		auto blue = Builder.CreateGEP(l, two);
-		auto store = Builder.CreateStore(local, blue);
-#endif
-		//auto load = Builder.CreateLoad(r);
-		//auto store = Builder.CreateStore(r, l);
-		//return Builder.CreateStore(r, l);
 
 		return ret;
 	}
@@ -165,8 +142,8 @@ public:
 		rhs->print();
 	}
 	llvm::Value* codegen() {
-		auto l = lhs->codegen();
-		auto r = rhs->codegen();
+		//auto l = lhs->codegen();
+		//auto r = rhs->codegen();
 
 		return nullptr;
 	}
@@ -232,7 +209,7 @@ public:
 				argumentTypes.push_back(CodeGen.floatType);
 				break;
 			case Type::Color:
-				argumentTypes.push_back(CodeGen.colorType);
+				argumentTypes.push_back(CodeGen.pointerToColorType);
 				break;
 			default:
 				error("Unknown Type in Argument codegen!");

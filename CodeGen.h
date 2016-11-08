@@ -28,8 +28,8 @@ public:
 public:
 
 	void installGlobalVariables() {
-		//namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
-		namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
+		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
+		//namedValues["Ci"] = new llvm::GlobalVariable(*module, floatType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
 	}
 
 	void insertNameValue(const std::string& name, llvm::Value* value) {

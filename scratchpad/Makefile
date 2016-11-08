@@ -1,6 +1,6 @@
 all: test
 
-LLC := ../../../src/llvm-3.9.0.src/build/Debug/bin/llc.exe
+LLC:=../../../src/llvm-3.9.0.src/build/Debug/bin/llc.exe
 
 testMatte: testMatte.c matte.s
 	gcc -o testMatte testMatte.c matte.s
@@ -8,6 +8,10 @@ testMatte: testMatte.c matte.s
 matte.s: matte.ll
 	$(LLC) matte.ll
 
+#t: test
+#test: bla.ll
+#	cat $<
+	
 bla.ll: bla.cc
 	clang -S -emit-llvm $<
 
