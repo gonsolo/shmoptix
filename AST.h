@@ -130,7 +130,36 @@ public:
 		llvm::outs() << "Function call: " << name << space << argument << newline;
 		std::vector<llvm::Value*> args;
 		auto arg = CodeGen.lookupNamedValue(argument);
+		auto argType = arg->getType();
+		auto llvmCall = CodeGen.lookupNamedValue(name);
+		auto callType = llvmCall->getType();
+		auto pointerType = llvm::cast<llvm::PointerType>(callType);
+		auto functionType = llvm::cast<llvm::FunctionType>(pointerType->getElementType());
+		auto paramType = functionType->getParamType(0);
+
 		args.push_back(arg);
+#if 0
+		llvm::outs() << "arg type: " << newline;
+		llvm::outs().flush();
+		argType->dump();
+		llvm::outs() << newline;
+		llvm::outs().flush();
+
+		llvm::outs() << "call type: " << newline;
+		llvm::outs().flush();
+		llvmCall->getType()->dump();
+		llvm::outs() << newline;
+		llvm::outs().flush();
+
+		llvm::outs() << "param type: " << newline;
+		llvm::outs().flush();
+		paramType->dump();
+		llvm::outs() << newline;
+		llvm::outs().flush();
+#endif
+		if (argType != paramType) {
+			error("Types do not match for function call \"" + name + "\"");
+		}
 		auto call = Builder.CreateCall(CodeGen.lookupNamedValue(name), args);
 
 		return call;

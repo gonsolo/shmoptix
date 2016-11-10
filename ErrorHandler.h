@@ -1,14 +1,18 @@
 #pragma once 
 
 #include <cstdlib>
-#include <iostream>
 #include <string>
+#include "global.h"
 
-class ErrorHandler {
-protected:
-	void error(std::string message) {
-		std::cerr << message << std::endl;
-		exit(-1);
-	}
-};
+namespace shmoptix {
+
+	class ErrorHandler {
+	protected:
+		void error(std::string message) {
+			llvm::outs() << message << newline;
+			exit(EXIT_FAILURE);
+		}
+	};
+
+}
 

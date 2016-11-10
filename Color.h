@@ -54,6 +54,7 @@ Color::Color(Vector3 vector) {
 	value[0] = vector.value[0];
 	value[1] = vector.value[1];
 	value[2] = vector.value[2];
+	llvm::outs() << "Constructed Color with " << *this << newline;
 }
 
 llvm::raw_ostream& operator<<(llvm::raw_ostream& out, const Color& color) {
