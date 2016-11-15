@@ -9,6 +9,5 @@ endif
 all: test
 t: test
 test:
-	echo $(OS)
 	./build/Debug/shmoptix$(EXE) matte.sl
 

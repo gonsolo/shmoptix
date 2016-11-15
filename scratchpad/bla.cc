@@ -1,11 +1,14 @@
 
 #if 1
-float Ci[3];
-void f(float Cs[3]) {
-	Ci[0] = Cs[0];
-	Ci[1] = Cs[1];
-	Ci[2] = Cs[2];
+float N[3];
+
+void diffuse(float x[3]) {
 }
+
+void matte() {
+	diffuse(N);
+}
+
 #endif
 
 #if 0

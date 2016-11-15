@@ -24,6 +24,8 @@ e: edit
 edit:
 	vi testMatte.c
 t: test
-test: testMatte
-	./testMatte
+#test: testMatte
+#	./testMatte
+test: bla.ll
+	cat $<
 

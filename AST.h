@@ -11,6 +11,8 @@
 #include "Type.h"
 #include "CodeGen.h"
 
+#include <stdio.h>
+
 namespace shmoptix {
 
 class AST : public ErrorHandler {
@@ -68,34 +70,8 @@ public:
 
 		if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.pointerToColorType) {
 			llvm::outs() << "WORKS? color*/color*" << newline;
-			auto alloc = Builder.CreateAlloca(CodeGen.pointerToColorType);
-			Builder.CreateStore(r, alloc);
-			auto load = Builder.CreateLoad(alloc);
-
-			auto zero = Builder.getInt32(0);
-			auto  one = Builder.getInt32(1);
-			auto  two = Builder.getInt32(2);
-
-			std::vector<llvm::Value*> idx{ zero, zero };
-			auto elem = Builder.CreateInBoundsGEP(load, idx);
-			auto loadElem = Builder.CreateLoad(elem);
-			std::vector<llvm::Value*> idx2{ zero, zero };
-			auto storeElem = Builder.CreateInBoundsGEP(l, idx2);
-			Builder.CreateStore(loadElem, storeElem);
-
-			idx[1] = one;
-			elem = Builder.CreateInBoundsGEP(load, idx);
-			loadElem = Builder.CreateLoad(elem);
-			idx2[1] = one;
-			storeElem = Builder.CreateInBoundsGEP(l, idx2);
-			Builder.CreateStore(loadElem, storeElem);
-
-			idx[1] = two;
-			elem = Builder.CreateInBoundsGEP(load, idx);
-			loadElem = Builder.CreateLoad(elem);
-			idx2[1] = two;
-			storeElem = Builder.CreateInBoundsGEP(l, idx2);
-			ret = Builder.CreateStore(loadElem, storeElem);
+			auto load = Builder.CreateLoad(r);
+			Builder.CreateStore(load, l);
 		}
 		else if (l->getType() == CodeGen.floatType && r->getType() == CodeGen.floatType) {
 			llvm::outs() << "TODO: float/float" << newline;
@@ -130,6 +106,13 @@ public:
 		llvm::outs() << "Function call: " << name << space << argument << newline;
 		std::vector<llvm::Value*> args;
 		auto arg = CodeGen.lookupNamedValue(argument);
+
+		auto zero = Builder.getInt32(0);
+		std::vector<llvm::Value*> idx0{ zero };
+		auto gep = Builder.CreateInBoundsGEP(arg, idx0);
+		auto test1 = Builder.CreateAlloca(CodeGen.pointerToColorType);
+		auto test2 = Builder.CreateStore(gep, test1);
+
 		auto argType = arg->getType();
 		auto llvmCall = CodeGen.lookupNamedValue(name);
 		auto callType = llvmCall->getType();
@@ -138,6 +121,8 @@ public:
 		auto paramType = functionType->getParamType(0);
 
 		args.push_back(arg);
+		//args.push_back(gep);
+
 #if 0
 		llvm::outs() << "arg type: " << newline;
 		llvm::outs().flush();
@@ -160,7 +145,8 @@ public:
 		if (argType != paramType) {
 			error("Types do not match for function call \"" + name + "\"");
 		}
-		auto call = Builder.CreateCall(CodeGen.lookupNamedValue(name), args);
+
+		auto call = Builder.CreateCall(llvmCall, args);
 
 		return call;
 	}

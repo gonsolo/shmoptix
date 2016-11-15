@@ -25,8 +25,13 @@ namespace shmoptix {
 
 	Color Cl{ 1.f }; // light color
 
-	Color diffuse(Vector3 N) {
-		Color C{ N };
+	//Color diffuse(Vector3 N) {
+	Color diffuse(float N[3]) {
+		//Color C{ N };
+		llvm::outs() << "N: " << N[0] << space << N[1] << space << N[2] << newline;
+		llvm::outs().flush();
+
+		Color C{444.f};
 
 		// Just one light instead of illuminance loop
 		//C += Cl * dot(normalize(L), N);
@@ -63,7 +68,6 @@ namespace shmoptix {
 			function = reinterpret_cast<decltype(function)>(address);
 			float Kd = 2.f;
 			float Cs[3]{ 23.f, 26.f, 39.f };
-			//float Cs{ 13.f };
 			function(Kd, Cs);
 		}
 
