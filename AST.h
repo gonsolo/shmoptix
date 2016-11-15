@@ -82,8 +82,15 @@ public:
 			auto load = Builder.CreateLoad(alloc);
 			ret = Builder.CreateStore(load, l);
 		}
+		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.colorType) {
+			Builder.CreateStore(r, l);
+		}
 		else {
 			llvm::outs() << "TODO: unknown" << newline;
+			llvm::outs().flush();
+			l->getType()->dump();
+			r->getType()->dump();
+			llvm::outs().flush();
 		}
 
 		return ret;
@@ -174,49 +181,21 @@ public:
 			llvm::outs().flush();
 
 			// promote float to color
-			auto alloc = Builder.CreateAlloca(CodeGen.colorType);
+			// better: insertelement, shuffleelement
 
-			auto zero = Builder.getInt32(0);
-			auto  one = Builder.getInt32(1);
-			auto  two = Builder.getInt32(2);
-
-			std::vector<llvm::Value*> idx0{ zero, zero };
-			auto alloc0 = Builder.CreateInBoundsGEP(alloc, idx0);
-			Builder.CreateStore(l, alloc0);
-			std::vector<llvm::Value*> idx1{ zero, one };
-			auto alloc1 = Builder.CreateInBoundsGEP(alloc, idx1);
-			Builder.CreateStore(l, alloc1);
-			std::vector<llvm::Value*> idx2{ zero, two};
-			auto alloc2 = Builder.CreateInBoundsGEP(alloc, idx2);
-			Builder.CreateStore(l, alloc2);
-
-			auto rhs0 = Builder.CreateInBoundsGEP(r, idx0);
-			auto rhsLoad0 = Builder.CreateLoad(rhs0);
-			auto rhs1 = Builder.CreateInBoundsGEP(r, idx1);
-			auto rhsLoad1 = Builder.CreateLoad(rhs1);
-			auto rhs2 = Builder.CreateInBoundsGEP(r, idx2);
-			auto rhsLoad2 = Builder.CreateLoad(rhs2);
-
-			auto load0 = Builder.CreateLoad(alloc0);
-			auto load1 = Builder.CreateLoad(alloc1);
-			auto load2 = Builder.CreateLoad(alloc2);
-
-			llvm::outs() << "Laber" << newline;
+			auto undef = llvm::UndefValue::get(CodeGen.colorType);
+			llvm::outs() << "undef type" << newline;
 			llvm::outs().flush();
-			alloc0->getType()->dump();
-			rhs0->getType()->dump();
-			load0->getType()->dump();
-			llvm::outs() << "Laber" << newline;
+			undef->getType()->dump();
+			auto ID = undef->getType()->getTypeID();
 			llvm::outs().flush();
-
-			auto mul0 = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, load0, rhsLoad0);
-			Builder.CreateStore(mul0, alloc0);
-			auto mul1 = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, load1, rhsLoad1);
-			Builder.CreateStore(mul1, alloc1);
-			auto mul2 = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, load2, rhsLoad2);
-			Builder.CreateStore(mul2, alloc2);
-
-			return alloc;
+			uint64_t idx = 0;
+			auto insert = Builder.CreateInsertElement(undef, l, idx);
+			auto zeroVec = llvm::Constant::getNullValue(CodeGen.int3Type);
+			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroVec);
+			auto load = Builder.CreateLoad(r);
+			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, shuffle, load);
+			return mul;
 		}
 		else {
 			error("Unimplemented binary expression");

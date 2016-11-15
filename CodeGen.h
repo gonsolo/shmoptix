@@ -50,10 +50,12 @@ public:
 	// Type cache
 	llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
 	llvm::Type* pointerToFloatType = llvm::PointerType::getUnqual(floatType);
-	llvm::Type* colorType = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(Context);
+	llvm::Type* colorType = llvm::VectorType::get(floatType, 3);
 	llvm::Type* pointerToColorType = llvm::PointerType::getUnqual(colorType);
-	llvm::Type* vector3Type = llvm::TypeBuilder<llvm::types::ieee_float[3], true>::get(Context);
+	llvm::Type* vector3Type = llvm::VectorType::get(floatType, 3);
 	llvm::Type* pointerToVector3Type = llvm::PointerType::getUnqual(vector3Type);
+	llvm::Type* intType = llvm::TypeBuilder<llvm::types::i<32>, true>::get(Context);
+	llvm::Type* int3Type = llvm::VectorType::get(intType, 3);
 
 private:
 	// Symbol table
