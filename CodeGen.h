@@ -56,7 +56,7 @@ public:
 	llvm::Type* vector4Type = llvm::VectorType::get(floatType, 4);
 	llvm::Type* pointerToVector3Type = llvm::PointerType::getUnqual(vector4Type);
 	llvm::Type* intType = llvm::TypeBuilder<llvm::types::i<32>, true>::get(Context);
-	llvm::Type* int4Type = llvm::VectorType::get(intType, 3);
+	llvm::Type* int4Type = llvm::VectorType::get(intType, 4);
 
 private:
 	// Symbol table

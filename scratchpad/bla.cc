@@ -1,5 +1,5 @@
 
-#if 1
+#if 0
 float N[3];
 
 void diffuse(float x[3]) {
@@ -11,11 +11,10 @@ void matte() {
 
 #endif
 
-#if 0
+#if 1
 float Ci;
-void f(float Cs) {
-	//Ci = Cs;
-	Ci = 13.f;
+void f(float Kd, float Cs[4]) {
+	Ci = Kd * Cs;
 }
 #endif
 

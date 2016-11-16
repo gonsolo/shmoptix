@@ -65,13 +65,13 @@ namespace shmoptix {
 
 			uint64_t address = engine->getFunctionAddress(name);
 
-			void(*function)(float[4]);
+			void(*function)(float, float[4]);
 
 			function = reinterpret_cast<decltype(function)>(address);
-			float Kd = 2.f;
+			float Kd = 3.f;
 			alignas(16) float Cs[4]{ 23.f, 26.f, 29.f, 32.f };
 
-			function(Cs);
+			function(Kd, Cs);
 		}
 
 	private:

@@ -202,6 +202,11 @@ public:
 			auto zeroVec = llvm::Constant::getNullValue(CodeGen.int4Type);
 			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroVec);
 			auto load = Builder.CreateLoad(r);
+			llvm::outs() << "bin types" << newline;
+			llvm::outs().flush();
+			shuffle->getType()->dump();
+			load->getType()->dump();
+			llvm::outs().flush();
 			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, shuffle, load);
 			return mul;
 		}
