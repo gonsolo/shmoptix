@@ -28,8 +28,9 @@ public:
 public:
 
 	void installGlobalVariables() {
-		namedValues["Ci"] = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
-		namedValues["N"] = new llvm::GlobalVariable(*module, vector3Type, false, llvm::GlobalValue::ExternalLinkage, nullptr, "N");
+		alignas(16) llvm::Value* Ci = new llvm::GlobalVariable(*module, colorType, false, llvm::GlobalValue::ExternalLinkage, nullptr, "Ci");
+		namedValues["Ci"] = Ci;
+		namedValues["N"] = new llvm::GlobalVariable(*module, vector4Type, false, llvm::GlobalValue::ExternalLinkage, nullptr, "N");
 
 		std::vector<llvm::Type*> argumentTypes;
 		argumentTypes.push_back(pointerToVector3Type);
@@ -50,12 +51,12 @@ public:
 	// Type cache
 	llvm::Type* floatType = llvm::TypeBuilder<llvm::types::ieee_float, true>::get(Context);
 	llvm::Type* pointerToFloatType = llvm::PointerType::getUnqual(floatType);
-	llvm::Type* colorType = llvm::VectorType::get(floatType, 3);
+	llvm::Type* colorType = llvm::VectorType::get(floatType, 4);
 	llvm::Type* pointerToColorType = llvm::PointerType::getUnqual(colorType);
-	llvm::Type* vector3Type = llvm::VectorType::get(floatType, 3);
-	llvm::Type* pointerToVector3Type = llvm::PointerType::getUnqual(vector3Type);
+	llvm::Type* vector4Type = llvm::VectorType::get(floatType, 4);
+	llvm::Type* pointerToVector3Type = llvm::PointerType::getUnqual(vector4Type);
 	llvm::Type* intType = llvm::TypeBuilder<llvm::types::i<32>, true>::get(Context);
-	llvm::Type* int3Type = llvm::VectorType::get(intType, 3);
+	llvm::Type* int4Type = llvm::VectorType::get(intType, 3);
 
 private:
 	// Symbol table

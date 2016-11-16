@@ -10,16 +10,17 @@
 
 namespace shmoptix {
 
-	Vector3 L{ 1.f, 0.f, 0.f }; // dummy light vector
+	Vector4 L{ 1.f, 0.f, 0.f }; // dummy light vector
 
-	float dot(Vector3 a, Vector3 b) {
-		return a.value[0] * b.value[0] + a.value[1] * b.value[1] + a.value[2] * b.value[2];
+	float dot(Vector4 a, Vector4 b) {
+		//return a.value[0] * b.value[0] + a.value[1] * b.value[1] + a.value[2] * b.value[2];
+		return 0.f;
 	}
 
-	float length(Vector3 vector) {
+	float length(Vector4 vector) {
 		return sqrtf(dot(vector, vector));
 	}
-	Vector3 normalize(Vector3 vector) {
+	Vector4 normalize(Vector4 vector) {
 		return vector / length(vector);
 	}
 
@@ -48,10 +49,11 @@ namespace shmoptix {
 				llvm::outs() << "Failed to create engine: " << errorString << newline;
 				exit(EXIT_FAILURE);
 			}
+
 			engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)Ci.get());
-			engine->addGlobalMapping(leading_underscore + "N", (uint64_t)N.get());
+			//engine->addGlobalMapping(leading_underscore + "N", (uint64_t)N.get());
+			engine->addGlobalMapping(leading_underscore + "N", (uint64_t)&N);
 			engine->addGlobalMapping(leading_underscore + "diffuse", (uint64_t)diffuse);
-			//engine->addGlobalMapping(leading_underscore + "Ci", (uint64_t)&Ci);
 		}
 
 	public:
@@ -62,20 +64,19 @@ namespace shmoptix {
 		void runFunction(const std::string& name, llvm::Function* oldfunction) {
 
 			uint64_t address = engine->getFunctionAddress(name);
-			//void(*function)(float, float[3]);
-			void(*function)(float, __m128);
+
+			void(*function)(float[4]);
 
 			function = reinterpret_cast<decltype(function)>(address);
 			float Kd = 2.f;
-			//float Cs[3]{ 23.f, 26.f, 29.f };
-			__m128 Cs{ 23.f, 26.f, 29.f };
+			alignas(16) float Cs[4]{ 23.f, 26.f, 29.f, 32.f };
 
-			function(Kd, Cs);
+			function(Cs);
 		}
 
 	private:
 		llvm::ExecutionEngine* engine;
 		Color Ci{ 99.f, 66.f, 33.f };
-		Vector3 N{ 7.f, 77.f, 777.f };
+		Vector4 N{ 7.f, 77.f, 777.f };
 	};
 }

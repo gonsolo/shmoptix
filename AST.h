@@ -69,29 +69,37 @@ public:
 		llvm::outs() << *(l->getType()) << " " << *(r->getType()) << newline;
 
 		if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.pointerToColorType) {
-			llvm::outs() << "WORKS? color*/color*" << newline;
-			auto load = Builder.CreateLoad(r);
-			Builder.CreateStore(load, l);
+			llvm::outs() << "assign color*/color*" << newline;
+			auto load = Builder.CreateAlignedLoad(r, 16);
+			//Builder.CreateStore(load, l);
+			Builder.CreateAlignedStore(load, l, 16);
 		}
 		else if (l->getType() == CodeGen.floatType && r->getType() == CodeGen.floatType) {
-			llvm::outs() << "TODO: float/float" << newline;
+			llvm::outs() << "assign float/float" << newline;
 		}
 		else if (l->getType() == CodeGen.pointerToFloatType && r->getType() == CodeGen.floatType) {
+			llvm::outs() << "assign float*/float" << newline;
 			auto alloc = Builder.CreateAlloca(CodeGen.floatType);
 			Builder.CreateStore(r, alloc);
 			auto load = Builder.CreateLoad(alloc);
 			ret = Builder.CreateStore(load, l);
 		}
 		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.colorType) {
+			llvm::outs() << "assign color*/color" << newline;
+			Builder.CreateStore(r, l);
+		}
+		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.floatType) {
+			llvm::outs() << "assign color*/float" << newline;
 			Builder.CreateStore(r, l);
 		}
 		else {
-			llvm::outs() << "TODO: unknown" << newline;
+			llvm::outs() << "assign: unknown" << newline;
 			llvm::outs().flush();
 			l->getType()->dump();
 			r->getType()->dump();
 			llvm::outs().flush();
 		}
+		llvm::outs().flush();
 
 		return ret;
 	}
@@ -191,7 +199,7 @@ public:
 			llvm::outs().flush();
 			uint64_t idx = 0;
 			auto insert = Builder.CreateInsertElement(undef, l, idx);
-			auto zeroVec = llvm::Constant::getNullValue(CodeGen.int3Type);
+			auto zeroVec = llvm::Constant::getNullValue(CodeGen.int4Type);
 			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroVec);
 			auto load = Builder.CreateLoad(r);
 			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, shuffle, load);
@@ -312,9 +320,10 @@ public:
 		}
 		if (body) {
 			body->codegen();
-			Builder.CreateRetVoid();
-			llvm::verifyFunction(*function);
 		}
+		Builder.CreateRetVoid();
+		llvm::verifyFunction(*function);
+
 		return function;
 	}
 private:

@@ -35,7 +35,25 @@ llvm::IRBuilder<>& getBuilder() {
 
 using namespace shmoptix;
 
+__m128 laber(__m128 x) {
+	return x;
+}
+
+void testSSE() {
+	__m128 bla{ 1, 2, 3, 4 };
+
+	__m128 c = laber(bla);
+	alignas(16) float d[4];
+	_mm_store_ps(d, c);
+	std::cout << d[0] << space << d[1] << space << d[2] << space << d[3] << newline;
+
+	float* e = reinterpret_cast<float*>(&c);
+	std::cout << e[0] << space << e[1] << space << e[2] << space << e[3] << newline;
+}
+
 int main(int argc, char** argv) {
+
+	//testSSE();
 
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
