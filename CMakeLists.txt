@@ -22,6 +22,9 @@ endif()
 
 if(MSVC)
 	message(STATUS "Using MSVC")
+	# Suppress warnings like LLVM/cmake/modules/HandleLLVLMOptions.cmake
+	add_definitions("/wd4141 /wd4146 /wd4267 /wd4244 /wd4800 /wd4291")
+
 	include_directories(${LLVM_DIR}/include)
 	include_directories(${LLVM_DIR}/build/include)
 	link_directories(${LLVM_DIR}/build/Debug/lib)

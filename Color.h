@@ -29,6 +29,10 @@ public:
 
 		return *this;
 	}
+
+	float& operator[](int i) {
+		return value[i];
+	}
 public:
 	uint64_t get() { return (uint64_t)&value; }
 public:

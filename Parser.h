@@ -166,6 +166,9 @@ public:
 	}
 
 	auto parseStatement() {
+		// parse first token
+		// parse postfix expression suffix
+
 		return parseAssignmentExpression();
 
 	}

@@ -90,7 +90,10 @@ public:
 		}
 		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.floatType) {
 			llvm::outs() << "assign color*/float" << newline;
-			Builder.CreateStore(r, l);
+			// TODO
+			auto load = Builder.CreateLoad(r);
+			// Builder.CreateStore(load, l);
+			//Builder.CreateStore(r, l);
 		}
 		else {
 			llvm::outs() << "assign: unknown" << newline;
@@ -109,6 +112,7 @@ private:
 	std::unique_ptr<ExprAST> rhs;
 };
 
+
 class FunctionCallAST : public ExprAST {
 public:
 	FunctionCallAST(const std::string& name, const std::string argument) : name(name), argument(argument) {}
@@ -119,8 +123,17 @@ public:
 	llvm::Value* codegen() {
 		
 		llvm::outs() << "Function call: " << name << space << argument << newline;
-		std::vector<llvm::Value*> args;
+#if 0
 		auto arg = CodeGen.lookupNamedValue(argument);
+		return arg;
+#endif
+
+
+		std::vector<llvm::Value*> args;
+		auto llvmCall = CodeGen.lookupNamedValue(name);
+		auto call = Builder.CreateCall(llvmCall, args);
+		return call;
+#if 0
 
 		auto zero = Builder.getInt32(0);
 		std::vector<llvm::Value*> idx0{ zero };
@@ -137,6 +150,7 @@ public:
 
 		args.push_back(arg);
 		//args.push_back(gep);
+#endif
 
 #if 0
 		llvm::outs() << "arg type: " << newline;
@@ -157,6 +171,7 @@ public:
 		llvm::outs() << newline;
 		llvm::outs().flush();
 #endif
+#if 0
 		if (argType != paramType) {
 			error("Types do not match for function call \"" + name + "\"");
 		}
@@ -164,6 +179,7 @@ public:
 		auto call = Builder.CreateCall(llvmCall, args);
 
 		return call;
+#endif
 	}
 private:
 	std::string name;

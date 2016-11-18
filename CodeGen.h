@@ -33,8 +33,9 @@ public:
 		namedValues["N"] = new llvm::GlobalVariable(*module, vector4Type, false, llvm::GlobalValue::ExternalLinkage, nullptr, "N");
 
 		std::vector<llvm::Type*> argumentTypes;
-		argumentTypes.push_back(pointerToVector3Type);
-		auto functionType = llvm::FunctionType::get(pointerToColorType, argumentTypes, false);
+		//argumentTypes.push_back(pointerToVector3Type);
+		auto functionType = llvm::FunctionType::get(floatType, argumentTypes, false);
+		//auto functionType = llvm::FunctionType::get(voidType, argumentTypes, false);
 		auto function = llvm::Function::Create(functionType, llvm::GlobalValue::ExternalLinkage, "diffuse", module.get());
 		namedValues["diffuse"] = function;
 	}
@@ -57,6 +58,7 @@ public:
 	llvm::Type* pointerToVector3Type = llvm::PointerType::getUnqual(vector4Type);
 	llvm::Type* intType = llvm::TypeBuilder<llvm::types::i<32>, true>::get(Context);
 	llvm::Type* int4Type = llvm::VectorType::get(intType, 4);
+	llvm::Type* voidType = llvm::Type::getVoidTy(Context);
 
 private:
 	// Symbol table

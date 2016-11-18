@@ -27,16 +27,22 @@ namespace shmoptix {
 	Color Cl{ 1.f }; // light color
 
 	//Color diffuse(Vector3 N) {
-	Color diffuse(float N[3]) {
-		//Color C{ N };
-		llvm::outs() << "N: " << N[0] << space << N[1] << space << N[2] << newline;
-		llvm::outs().flush();
+	//Color diffuse(float N[4]) {
 
-		Color C{444.f};
+	float res = 33.f;
+
+	float diffuse() {
+		//Color C{ N };
+		//llvm::outs() << "N: " << N[0] << space << N[1] << space << N[2] << newline;
+		//llvm::outs().flush();
+
+		//Color C{444.f};
+		//C[0] = 333.f;
 
 		// Just one light instead of illuminance loop
 		//C += Cl * dot(normalize(L), N);
-		return C;
+
+		return 33.f;
 	}
 
 	class ExecutionEnvironment {
