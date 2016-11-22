@@ -2,6 +2,8 @@
 
 ifeq ($(OS),Windows_NT)
     EXE := .exe
+    BUILD := RelWithDebInfo
+    #BUILD := Debug
 else
     EXE :=
 endif
@@ -9,5 +11,5 @@ endif
 all: test
 t: test
 test:
-	./build/Debug/shmoptix$(EXE) matte.sl
+	./build/$(BUILD)/shmoptix$(EXE) matte.sl
 
