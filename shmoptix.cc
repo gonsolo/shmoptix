@@ -62,8 +62,7 @@ int main(int argc, char** argv) {
 	auto shader = parser.parse(shaderStream);
 	auto function = shader->codegen();
 
-	module->dump();
-	//return 0;
+	//module->dump();
 
 	llvm::outs() << "Verifying" << newline;
 	if (llvm::verifyModule(*module, &llvm::dbgs())) {
@@ -71,11 +70,11 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 	llvm::outs() << "Verification ok." << newline;
-#if 1
+
 	ExecutionEnvironment executionEnvironment(std::move(module));
 	executionEnvironment.dump();
 	executionEnvironment.runFunction(function->getName().str());
 	executionEnvironment.dump();
-#endif
+
 	llvm::outs() << "Done" << newline;
 }

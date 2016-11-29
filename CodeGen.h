@@ -34,7 +34,8 @@ public:
 
 		std::vector<llvm::Type*> diffuseArgumentTypes;
 		diffuseArgumentTypes.push_back(pointerToVector4Type);
-		auto diffuseType = llvm::FunctionType::get(floatType, diffuseArgumentTypes, false);
+		//auto diffuseType = llvm::FunctionType::get(floatType, diffuseArgumentTypes, false);
+		auto diffuseType = llvm::FunctionType::get(colorType, diffuseArgumentTypes, false);
 		auto diffuse = llvm::Function::Create(diffuseType, llvm::GlobalValue::ExternalLinkage, "diffuse", module.get());
 		namedValues["diffuse"] = diffuse;
 	}

@@ -13,8 +13,7 @@ namespace shmoptix {
 	Vector4 L{ 1.f, 0.f, 0.f }; // dummy light vector
 
 	float dot(Vector4 a, Vector4 b) {
-		//return a.value[0] * b.value[0] + a.value[1] * b.value[1] + a.value[2] * b.value[2];
-		return 0.f;
+		return a.value[0] * b.value[0] + a.value[1] * b.value[1] + a.value[2] * b.value[2];
 	}
 
 	float length(Vector4 vector) {
@@ -26,23 +25,15 @@ namespace shmoptix {
 
 	Color Cl{ 1.f }; // light color
 
-	//Color diffuse(Vector3 N) {
-	//Color diffuse(float N[4]) {
+	Color diffuse(Vector4* N) {
 
-	float res = 33.f;
-
-	float diffuse(Vector4* v) {
-		//Color C{ N };
-		//llvm::outs() << "N: " << N[0] << space << N[1] << space << N[2] << newline;
-		//llvm::outs().flush();
-
-		//Color C{444.f};
-		//C[0] = 333.f;
+		Color C{1.f};
 
 		// Just one light instead of illuminance loop
-		//C += Cl * dot(normalize(L), N);
+		C += Cl * dot(normalize(L), *N);
 
-		return 3.f * v->value[0];
+		//return 3.f * v->value[0];
+		return C;
 	}
 
 	class ExecutionEnvironment {

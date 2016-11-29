@@ -66,39 +66,24 @@ public:
 
 		llvm::Value* ret = nullptr;
 
-		llvm::outs() << *(l->getType()) << " " << *(r->getType()) << newline;
-
 		if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.pointerToColorType) {
-			llvm::outs() << "assign color*/color*" << newline;
 			auto load = Builder.CreateAlignedLoad(r, 16);
 			//Builder.CreateStore(load, l);
 			Builder.CreateAlignedStore(load, l, 16);
 		}
 		else if (l->getType() == CodeGen.floatType && r->getType() == CodeGen.floatType) {
-			llvm::outs() << "assign float/float" << newline;
+			llvm::outs() << "TODO assign float/float" << newline;
 		}
 		else if (l->getType() == CodeGen.pointerToFloatType && r->getType() == CodeGen.floatType) {
-			llvm::outs() << "assign float*/float" << newline;
 			auto alloc = Builder.CreateAlloca(CodeGen.floatType);
 			Builder.CreateStore(r, alloc);
 			auto load = Builder.CreateLoad(alloc);
 			ret = Builder.CreateStore(load, l);
 		}
 		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.colorType) {
-			llvm::outs() << "assign color*/color" << newline;
 			Builder.CreateStore(r, l);
 		}
 		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.floatType) {
-			llvm::outs() << "assign color*/float" << newline;
-			// TODO
-			auto alloc = Builder.CreateAlloca(CodeGen.floatType);
-			Builder.CreateStore(r, alloc);
-			//auto load = Builder.CreateLoad(r);
-			// Builder.CreateStore(load, l);
-			//Builder.CreateStore(r, l);
-
-			//auto load = Builder.CreateLoad(alloc);
-			//ret = Builder.CreateStore(load, l);
 
 			// promote float to color
 			auto undef = llvm::UndefValue::get(CodeGen.colorType);
@@ -108,7 +93,6 @@ public:
 			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroInt);
 
 			ret = Builder.CreateStore(shuffle, l);
-
 	}
 		else {
 			llvm::outs() << "assign: unknown" << newline;
@@ -213,9 +197,6 @@ public:
 
 		if (l->getType() == CodeGen.floatType && r->getType() == CodeGen.pointerToColorType) {
 
-			llvm::outs() << "float mul pointerToColor" << newline;
-			llvm::outs().flush();
-
 			// promote float to color
 			auto undef = llvm::UndefValue::get(CodeGen.colorType);
 			uint64_t idx = 0;
@@ -228,7 +209,6 @@ public:
 			return mul;
 		}
 		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.floatType) {
-			llvm::outs() << "Binary: color* float" << newline;
 
 			// promote float to color
 			auto undef = llvm::UndefValue::get(CodeGen.colorType);
@@ -250,6 +230,12 @@ public:
 			auto zeroVec = llvm::Constant::getNullValue(CodeGen.int4Type);
 			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroVec);
 			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, shuffle, r);
+			return mul;
+		}
+		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.colorType) {
+
+			auto load = Builder.CreateLoad(l);
+			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, load, r);
 			return mul;
 		}
 		else {
