@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 
 	ExecutionEnvironment executionEnvironment(std::move(module));
 	executionEnvironment.dump();
-	executionEnvironment.runFunction(function->getName().str(), function);
+	executionEnvironment.runFunction(function->getName().str());
 	executionEnvironment.dump();
 	llvm::outs() << "Done" << newline;
 }

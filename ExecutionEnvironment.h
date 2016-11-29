@@ -67,7 +67,7 @@ namespace shmoptix {
 			llvm::outs() << "Ci: " << Ci << newline;
 		}
 
-		void runFunction(const std::string& name, llvm::Function* oldfunction) {
+		void runFunction(const std::string& name) {
 
 			uint64_t address = engine->getFunctionAddress(name);
 
