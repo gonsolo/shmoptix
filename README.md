@@ -1,0 +1,3 @@
+# shmoptix
+
+Play with LLVM.
