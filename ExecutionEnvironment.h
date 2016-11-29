@@ -73,7 +73,7 @@ namespace shmoptix {
 
 	private:
 		llvm::ExecutionEngine* engine;
-		Color Ci{ 99.f, 66.f, 33.f };
+		Color Ci{ 13.f, 66.f, 33.f };
 		Vector4 N{ 7.f, 77.f, 777.f };
 	};
 }
