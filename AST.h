@@ -241,7 +241,20 @@ public:
 			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, load, shuffle);
 			return mul;
 		}
+		else if (l->getType() == CodeGen.floatType && r->getType() == CodeGen.colorType) {
+
+			// promote float to color
+			auto undef = llvm::UndefValue::get(CodeGen.colorType);
+			uint64_t idx = 0;
+			auto insert = Builder.CreateInsertElement(undef, l, idx);
+			auto zeroVec = llvm::Constant::getNullValue(CodeGen.int4Type);
+			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroVec);
+			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, shuffle, r);
+			return mul;
+		}
 		else {
+			l->getType()->dump();
+			r->getType()->dump();
 			error("Unimplemented binary expression");
 			return nullptr;
 		}
