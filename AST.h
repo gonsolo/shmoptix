@@ -217,7 +217,6 @@ public:
 			llvm::outs().flush();
 
 			// promote float to color
-
 			auto undef = llvm::UndefValue::get(CodeGen.colorType);
 			uint64_t idx = 0;
 			auto insert = Builder.CreateInsertElement(undef, l, idx);
@@ -226,6 +225,20 @@ public:
 	
 			auto load = Builder.CreateLoad(r);
 			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, shuffle, load);
+			return mul;
+		}
+		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.floatType) {
+			llvm::outs() << "Binary: color* float" << newline;
+
+			// promote float to color
+			auto undef = llvm::UndefValue::get(CodeGen.colorType);
+			uint64_t idx = 0;
+			auto insert = Builder.CreateInsertElement(undef, r, idx);
+			auto zeroVec = llvm::Constant::getNullValue(CodeGen.int4Type);
+			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroVec);
+	
+			auto load = Builder.CreateLoad(l);
+			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, load, shuffle);
 			return mul;
 		}
 		else {
