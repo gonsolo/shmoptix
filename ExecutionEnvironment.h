@@ -42,7 +42,7 @@ namespace shmoptix {
 		// Just one light instead of illuminance loop
 		//C += Cl * dot(normalize(L), N);
 
-		return 33.f;
+		return 375.f;
 	}
 
 	class ExecutionEnvironment {

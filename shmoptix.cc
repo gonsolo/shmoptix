@@ -71,10 +71,11 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 	llvm::outs() << "Verification ok." << newline;
-
+#if 1
 	ExecutionEnvironment executionEnvironment(std::move(module));
 	executionEnvironment.dump();
 	executionEnvironment.runFunction(function->getName().str());
 	executionEnvironment.dump();
+#endif
 	llvm::outs() << "Done" << newline;
 }

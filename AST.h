@@ -91,10 +91,25 @@ public:
 		else if (l->getType() == CodeGen.pointerToColorType && r->getType() == CodeGen.floatType) {
 			llvm::outs() << "assign color*/float" << newline;
 			// TODO
-			auto load = Builder.CreateLoad(r);
+			auto alloc = Builder.CreateAlloca(CodeGen.floatType);
+			Builder.CreateStore(r, alloc);
+			//auto load = Builder.CreateLoad(r);
 			// Builder.CreateStore(load, l);
 			//Builder.CreateStore(r, l);
-		}
+
+			//auto load = Builder.CreateLoad(alloc);
+			//ret = Builder.CreateStore(load, l);
+
+			// promote float to color
+			auto undef = llvm::UndefValue::get(CodeGen.colorType);
+			uint64_t idx = 0;
+			auto insert = Builder.CreateInsertElement(undef, r, idx);
+			auto zeroInt = llvm::Constant::getNullValue(CodeGen.int4Type);
+			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroInt);
+
+			ret = Builder.CreateStore(shuffle, l);
+
+	}
 		else {
 			llvm::outs() << "assign: unknown" << newline;
 			llvm::outs().flush();
@@ -115,14 +130,17 @@ private:
 
 class FunctionCallAST : public ExprAST {
 public:
-	FunctionCallAST(const std::string& name, const std::string argument) : name(name), argument(argument) {}
+	//FunctionCallAST(const std::string& name, const std::string argument) : name(name), argument(argument) {}
+	FunctionCallAST(const std::string& name) : name(name) {}
 public:
 	void print() {
-		llvm::outs() << "FunctionCallAST " << name << space << argument << newline;
+		//llvm::outs() << "FunctionCallAST " << name << space << argument << newline;
+		llvm::outs() << "FunctionCallAST " << name << newline;
 	}
 	llvm::Value* codegen() {
 		
 		llvm::outs() << "Function call: " << name << space << argument << newline;
+		llvm::outs() << "Function call: " << name << newline;
 #if 0
 		auto arg = CodeGen.lookupNamedValue(argument);
 		return arg;
@@ -205,24 +223,14 @@ public:
 			llvm::outs().flush();
 
 			// promote float to color
-			// better: insertelement, shuffleelement
 
 			auto undef = llvm::UndefValue::get(CodeGen.colorType);
-			llvm::outs() << "undef type" << newline;
-			llvm::outs().flush();
-			undef->getType()->dump();
-			auto ID = undef->getType()->getTypeID();
-			llvm::outs().flush();
 			uint64_t idx = 0;
 			auto insert = Builder.CreateInsertElement(undef, l, idx);
 			auto zeroVec = llvm::Constant::getNullValue(CodeGen.int4Type);
 			auto shuffle = Builder.CreateShuffleVector(insert, undef, zeroVec);
+	
 			auto load = Builder.CreateLoad(r);
-			llvm::outs() << "bin types" << newline;
-			llvm::outs().flush();
-			shuffle->getType()->dump();
-			load->getType()->dump();
-			llvm::outs().flush();
 			auto mul = Builder.CreateBinOp(llvm::Instruction::BinaryOps::FMul, shuffle, load);
 			return mul;
 		}

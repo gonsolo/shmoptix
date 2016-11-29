@@ -2,8 +2,8 @@
 
 ifeq ($(OS),Windows_NT)
     EXE := .exe
-    BUILD := RelWithDebInfo
-    #BUILD := Debug
+    #BUILD := RelWithDebInfo
+    BUILD := Debug
 else
     EXE :=
 endif

@@ -103,24 +103,11 @@ public:
 		expect(tok_identifier, "Error identifier");
 		auto name = lexer.getIdentifier();
 		getNextToken();
+		return std::make_unique<VariableExprAST>(name);
 
-		// Identifier
-		if (token != tok_paren_open) {
-			return std::make_unique<VariableExprAST>(name);
-		}
-
-		// Function call
-		expect(tok_paren_open);
-		getNextToken();
-		auto argument = lexer.getIdentifier();
-		getNextToken();
-		expect(tok_paren_close);
-		getNextToken();
-		std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(name, argument);
-		return functionCall;
 	}
 
-	std::unique_ptr<ExprAST> parsePrimary() {
+	std::unique_ptr<ExprAST> parsePrimaryExpression() {
 		return parseIdentifier();
 	}
 
@@ -131,8 +118,8 @@ public:
 		return expression;
 	}
 
-	std::unique_ptr<ExprAST> parseBinaryExpression() {
-		auto lhs = parsePrimary();
+	std::unique_ptr<ExprAST> parseBinaryExpression(std::unique_ptr<ExprAST> lhs) {
+		//auto lhs = parsePrimaryExpression();
 		std::unique_ptr<ExprAST> rhs;
 		switch(token) {
 		case tok_semicolon:
@@ -149,13 +136,35 @@ public:
 		return binaryExpression;
 	}
 
+	std::unique_ptr<ExprAST> parseFunctionCall(const std::string& name) {
+		expect(tok_paren_open);
+		getNextToken();
+		//auto argument = lexer.getIdentifier();
+		//getNextToken();
+		expect(tok_paren_close);
+		getNextToken();
+		//std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(first, argument);
+		std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(name);
+		return functionCall;
+	}
+
 	std::unique_ptr<ExprAST> parseExpression() {
-		return parseBinaryExpression();
+
+		expect(tok_identifier, "Error identifier");
+		auto first = lexer.getIdentifier();
+		getNextToken();
+		if (token == tok_paren_open) {
+			return parseFunctionCall(std::move(first));
+		}
+		else {
+			auto lhs = std::make_unique<VariableExprAST>(first);
+			return parseBinaryExpression(std::move(lhs));
+		}
 	}
 
 	std::unique_ptr<ExprAST> parseAssignmentExpression() {
 
-		auto lhs = parsePrimary();
+		auto lhs = parsePrimaryExpression();
 		expect(tok_equals, "Error equals");
 		getNextToken();
 		auto rhs = parseExpression();
