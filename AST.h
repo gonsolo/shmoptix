@@ -131,11 +131,11 @@ private:
 class FunctionCallAST : public ExprAST {
 public:
 	//FunctionCallAST(const std::string& name, const std::string argument) : name(name), argument(argument) {}
-	FunctionCallAST(const std::string& name) : name(name) {}
+	FunctionCallAST(const std::string& name, const std::string& argument) : name(name), argument(argument) {}
 public:
 	void print() {
 		//llvm::outs() << "FunctionCallAST " << name << space << argument << newline;
-		llvm::outs() << "FunctionCallAST " << name << newline;
+		llvm::outs() << "FunctionCallAST " << name << space << argument << newline;
 	}
 	llvm::Value* codegen() {
 		
@@ -149,6 +149,8 @@ public:
 
 		std::vector<llvm::Value*> args;
 		auto llvmCall = CodeGen.lookupNamedValue(name);
+		auto arg = CodeGen.lookupNamedValue(argument);
+		args.push_back(arg);
 		auto call = Builder.CreateCall(llvmCall, args);
 		return call;
 #if 0

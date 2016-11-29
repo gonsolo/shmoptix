@@ -139,12 +139,16 @@ public:
 	std::unique_ptr<ExprAST> parseFunctionCall(const std::string& name) {
 		expect(tok_paren_open);
 		getNextToken();
-		//auto argument = lexer.getIdentifier();
-		//getNextToken();
+
+		std::string argument;
+		if (token == tok_identifier) {
+			argument = lexer.getIdentifier();
+			getNextToken();
+		}
 		expect(tok_paren_close);
 		getNextToken();
 		//std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(first, argument);
-		std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(name);
+		std::unique_ptr<ExprAST> functionCall = std::make_unique<FunctionCallAST>(name, argument);
 		return functionCall;
 	}
 

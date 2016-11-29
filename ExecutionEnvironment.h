@@ -31,7 +31,7 @@ namespace shmoptix {
 
 	float res = 33.f;
 
-	float diffuse() {
+	float diffuse(Vector4* v) {
 		//Color C{ N };
 		//llvm::outs() << "N: " << N[0] << space << N[1] << space << N[2] << newline;
 		//llvm::outs().flush();
@@ -42,7 +42,7 @@ namespace shmoptix {
 		// Just one light instead of illuminance loop
 		//C += Cl * dot(normalize(L), N);
 
-		return 375.f;
+		return 3.f * v->value[0];
 	}
 
 	class ExecutionEnvironment {
