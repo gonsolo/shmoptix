@@ -139,14 +139,6 @@ public:
 	}
 	llvm::Value* codegen() {
 		
-		llvm::outs() << "Function call: " << name << space << argument << newline;
-		llvm::outs() << "Function call: " << name << newline;
-#if 0
-		auto arg = CodeGen.lookupNamedValue(argument);
-		return arg;
-#endif
-
-
 		std::vector<llvm::Value*> args;
 		auto llvmCall = CodeGen.lookupNamedValue(name);
 		auto arg = CodeGen.lookupNamedValue(argument);
