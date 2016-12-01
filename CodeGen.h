@@ -56,6 +56,7 @@ public:
 	llvm::Type* pointerToColorType = llvm::PointerType::getUnqual(colorType);
 	llvm::Type* vector4Type = llvm::VectorType::get(floatType, 4);
 	llvm::Type* pointerToVector4Type = llvm::PointerType::getUnqual(vector4Type);
+	llvm::Type* normalType = llvm::VectorType::get(floatType, 4);
 	llvm::Type* intType = llvm::TypeBuilder<llvm::types::i<32>, true>::get(Context);
 	llvm::Type* int4Type = llvm::VectorType::get(intType, 4);
 	llvm::Type* voidType = llvm::Type::getVoidTy(Context);

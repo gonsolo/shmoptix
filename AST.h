@@ -17,8 +17,11 @@ namespace shmoptix {
 
 class AST : public ErrorHandler {
 public:
-	AST() : Builder(getBuilder()){}
+	AST() : Builder(getBuilder()) {}
 	virtual ~AST() {}
+public:
+	virtual void print() = 0;
+	virtual llvm::Value* codegen() = 0;
 protected:
 	llvm::IRBuilder<>& Builder;
 };
@@ -26,9 +29,6 @@ protected:
 class ExprAST : public AST {
 public:
 	virtual ~ExprAST() {}
-public:
-	virtual void print() = 0;
-	virtual llvm::Value* codegen() = 0;
 };
 
 class VariableExprAST : public ExprAST {
@@ -286,6 +286,20 @@ private:
 	double value;
 };
 
+class DeclarationAST : public AST {
+public:
+	DeclarationAST(const std::string& name, llvm::Value* value) : name(name), value(value) {}
+	virtual ~DeclarationAST() {}
+public:
+	void print() {}
+	llvm::Value* codegen() {
+		return nullptr;
+	}
+public:
+	std::string name;
+	llvm::Value* value;
+};
+
 class ShaderPrototypeAST : public ErrorHandler {
 public:
 
@@ -336,7 +350,7 @@ private:
 
 class SurfaceShaderAST : public AST {
 public:
-	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> prototype, std::unique_ptr<ExprAST> body) : prototype(std::move(prototype)), body(std::move(body)) {}
+	SurfaceShaderAST(std::unique_ptr<ShaderPrototypeAST> prototype, std::unique_ptr<AST> body) : prototype(std::move(prototype)), body(std::move(body)) {}
 public:
 
 	void print() {
@@ -363,7 +377,7 @@ public:
 	}
 private:
 	std::unique_ptr<ShaderPrototypeAST> prototype;
-	std::unique_ptr<ExprAST> body;
+	std::unique_ptr<AST> body;
 };
 
 }

@@ -172,18 +172,39 @@ public:
 		expect(tok_equals, "Error equals");
 		getNextToken();
 		auto rhs = parseExpression();
-		expect(tok_semicolon);
-		getNextToken();
 		std::unique_ptr<ExprAST> assignmentExpression = std::make_unique<AssignmentExprAST>(std::move(lhs), std::move(rhs));
 		return assignmentExpression;
 	}
+
+	std::unique_ptr<AST> parseDeclaration() {
+
+		expect(tok_normal);
+		getNextToken();
+		auto name = lexer.getIdentifier();
+		auto decl = new llvm::GlobalVariable(*module, CodeGen.normalType, false, llvm::GlobalValue::ExternalLinkage, nullptr, name);
+		CodeGen.insertNameValue(name, decl);
+
+		std::unique_ptr<AST> declaration = std::make_unique<DeclarationAST>(name, decl);
+		return declaration;
+	}
+
 
 	auto parseStatement() {
 		// parse first token
 		// parse postfix expression suffix
 
-		return parseAssignmentExpression();
+		std::unique_ptr<AST> statement;
 
+		if (token == tok_normal) {
+			statement = parseDeclaration();
+		}
+		else {
+			statement = parseAssignmentExpression();
+		}
+		expect(tok_semicolon);
+		getNextToken();
+
+		return statement;
 	}
 
 	auto parseStatements() {
@@ -194,7 +215,7 @@ public:
 
 		expect(tok_brace_open, "Expect open brace");
 		getNextToken();
-		std::unique_ptr<ExprAST> body;
+		std::unique_ptr<AST> body;
 		if(token != tok_brace_close) {
 			body = parseStatements();
 		}

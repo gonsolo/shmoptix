@@ -5,43 +5,46 @@
 
 namespace shmoptix {
 
-enum Token {
-	tok_eof = -1,
+	enum Token {
+		tok_eof = -1,
 
-	// commands
-	tok_surface = -2,
+		// Types
+		tok_surface = -2,
+		tok_normal = -3,
 
-	// primary
-	tok_identifier = -10,
-	tok_number = -11,
+		// Primary
+		tok_identifier = -10,
+		tok_number = -11,
 
-	// operators
-	tok_paren_open = -20,
-	tok_paren_close = -21,
-	tok_brace_open = -22,
-	tok_brace_close = -23,
-	tok_equals = -24,
-	tok_star = -25,
-	tok_slash = -26,
-	tok_semicolon = -27,
-	tok_comma = -28,
-};
+		// Operators
+		tok_paren_open = -20,
+		tok_paren_close = -21,
+		tok_brace_open = -22,
+		tok_brace_close = -23,
+		tok_equals = -24,
+		tok_star = -25,
+		tok_slash = -26,
+		tok_semicolon = -27,
+		tok_comma = -28,
+
+	};
 
 std::ostream& operator<<(std::ostream& out, Token token)
 {
 	switch (token) {
-	case tok_eof:			out << "eof"; break;
-	case tok_surface:		out << "surface"; break;
-	case tok_identifier:	out << "identifier"; break;
-	case tok_number:		out << "number"; break;
-	case tok_paren_open:	out << "("; break;
-	case tok_paren_close:	out << ")"; break;
-	case tok_brace_open:	out << "{"; break;
-	case tok_brace_close:	out << "}"; break;
-	case tok_equals:		out << "="; break;
-	case tok_star:			out << "*"; break;
-	case tok_semicolon:		out << ";"; break;
-	case tok_comma:			out << ","; break;
+	case tok_eof:			out << "eof";			break;
+	case tok_surface:		out << "surface";		break;
+	case tok_normal:		out << "normal";		break;
+	case tok_identifier:	out << "identifier";	break;
+	case tok_number:		out << "number";		break;
+	case tok_paren_open:	out << "(";				break;
+	case tok_paren_close:	out << ")";				break;
+	case tok_brace_open:	out << "{";				break;
+	case tok_brace_close:	out << "}";				break;
+	case tok_equals:		out << "=";				break;
+	case tok_star:			out << "*";				break;
+	case tok_semicolon:		out << ";";				break;
+	case tok_comma:			out << ",";				break;
 	default:				out << "unknown token"; break;
 	}
 	return out;
@@ -71,6 +74,8 @@ public:
 				identifier += lastChar;
 			if (identifier == "surface")
 				return tok_surface;
+			if (identifier == "normal")
+				return tok_normal;
 			return tok_identifier;
 		}
 		if (isdigit(lastChar)) {
